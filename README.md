@@ -1,5 +1,5 @@
 # Encrypted Password Repository App
-Encrypted password repository for university work. Uses Java 8.
+Encrypted password repository for university work. Uses Java 8. Code is commented in Portuguese for now, will translate to english later.
 
 ### Functionality: 
 - Saves and views encrypted passwords with a master password.
