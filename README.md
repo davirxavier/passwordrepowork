@@ -11,4 +11,5 @@ Encrypted password repository for university work. Uses Java 8.
 - A Category has the attribute Name.
 - Console oriented (graphical interface using JavaFX anf JPhoenix libraries planned).
 
+### Classes Diagram 
 ![Classes Diagram](/classesdiagram.png)
