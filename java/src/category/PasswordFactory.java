@@ -6,6 +6,11 @@ package category;
  */
 public class PasswordFactory
 {
+	public Password create(int id, String description, String username, String encryptedPassword)
+	{
+		return new Password(id, description, username, encryptedPassword);
+	}
+	
 	public Password create(String description, String username, String encryptedPassword)
 	{
 		return new Password(description, username, encryptedPassword);

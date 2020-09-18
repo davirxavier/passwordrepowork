@@ -4,19 +4,21 @@ import java.io.IOException;
 import java.util.*;
 
 import database.CategoryDAO;
-import database.CategoryDAO.UninitializedException;
 import exceptions.database.CategoryAlreadyExistsException;
 import exceptions.database.IncorrectSecretException;
-import database.DAO;
+import database.IDAO;
+import database.IDAOInner;
+import database.Initializable.UninitializedException;
 
 /**
  * 
  */
 public class CategoryController implements InputHandler
 {
-	private DAO<Category> dao;
+	private IDAO<Category> daoCategory;
+	private IDAOInner<Password, char[]> daoPassword;
 	private List<Category> categories;
-	public View view;
+	public IView view;
 
 	/**
 	 * Pergunta a view pelo segredo do usuário até o mesmo enviar o segredo correto.
@@ -28,18 +30,19 @@ public class CategoryController implements InputHandler
 	 * @throws Exception
 	 * @throws UninitializedException
 	 */
-	public CategoryController(View view, DAO<Category> dao) throws UninitializedException, Exception
+	public CategoryController(IView view, IDAO<Category> dao, IDAOInner<Password, char[]> daoPassword)
+			throws UninitializedException, Exception
 	{
 		this.view = view;
-		this.dao = dao;
+		this.daoCategory = dao;
 
 		while (true)
 		{
 			char[] secret = askViewForSecret("Insira sua senha mestra...");
-			boolean check = dao.checkSecret(secret);
+			boolean check = daoPassword.checkSecret(secret, true);
 			if (check)
 			{
-				categories = dao.getAll(secret);
+				categories = dao.getAll();
 				break;
 			}
 		}
@@ -158,6 +161,19 @@ public class CategoryController implements InputHandler
 	@Override
 	public char[] handleViewPassword(int catpos, int passpos, char[] secret) throws Exception
 	{
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleViewPassword");
+		}
+		if (passpos >= categories.get(catpos).getPasswords().size())
+		{
+			throw new InvalidInputException(passpos + "", "handleViewPassword");
+		}
+		if (!daoPassword.checkSecret(secret, false))
+		{
+			throw new IncorrectSecretException();
+		}
+
 		return getDecryptedPassword(catpos, passpos, secret);
 	}
 
@@ -166,17 +182,23 @@ public class CategoryController implements InputHandler
 	 * 
 	 * @param catpos  - int: Número da categoria.
 	 * @param newname - String: Novo nome para categoria.
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
 	 */
 	@Override
 	public void handleEditCategory(int catpos, String newname, char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleEditCategory");
+		}
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
+
 		setCategoryName(newname, catpos);
-		callUpdateDatabase(secret);
+		daoCategory.update(categories.get(catpos));
 	}
 
 	/**
@@ -195,11 +217,19 @@ public class CategoryController implements InputHandler
 	public void handleEditPassword(int catpos, int passpos, String passdesc, String passuser, char[] pass,
 			char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleViewPassword");
+		}
+		if (passpos >= categories.get(catpos).getPasswords().size())
+		{
+			throw new InvalidInputException(passpos + "", "handleViewPassword");
+		}
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
-		
+
 		boolean changes = false;
 		if (passdesc != null)
 		{
@@ -220,7 +250,10 @@ public class CategoryController implements InputHandler
 
 		if (changes)
 		{
-			callUpdateDatabase(secret);
+			Category category = categories.get(catpos);
+			Password password = category.getPassword(passpos);
+			
+			daoPassword.update(password.getId() + "", password);
 		}
 	}
 
@@ -234,7 +267,7 @@ public class CategoryController implements InputHandler
 	@Override
 	public void handleNewCategory(String newname, char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
@@ -245,11 +278,11 @@ public class CategoryController implements InputHandler
 				throw new CategoryAlreadyExistsException(newname);
 			}
 		}
-		
+
 		CategoryFactory factory = new CategoryFactory();
 		Category category = factory.create(newname);
 		categories.add(category);
-		callUpdateDatabase(secret);
+		daoCategory.insert(category);
 	}
 
 	/**
@@ -265,14 +298,18 @@ public class CategoryController implements InputHandler
 	@Override
 	public void handleNewPassword(int catpos, String desc, String user, char[] pass, char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleNewPassword");
+		}
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
-		
+
 		Category category = categories.get(catpos);
-		category.newPassword(desc, user, pass, secret);
-		callUpdateDatabase(secret);
+		Password password = category.newPassword(desc, user, pass, secret);
+		daoPassword.insert(catpos + "", password);
 	}
 
 	/**
@@ -284,13 +321,18 @@ public class CategoryController implements InputHandler
 	@Override
 	public void handleDeleteCategory(int catpos, char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleNewPassword");
+		}
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
-		
+
+		Category category = categories.get(catpos);
+		daoCategory.delete(category);
 		categories.remove(catpos);
-		callUpdateDatabase(secret);
 	}
 
 	/**
@@ -303,25 +345,37 @@ public class CategoryController implements InputHandler
 	@Override
 	public void handleDeletePassword(int catpos, int passpos, char[] secret) throws Exception
 	{
-		if(!dao.checkSecret(secret))
+		if (catpos >= categories.size())
+		{
+			throw new InvalidInputException(catpos + "", "handleDeletePassword");
+		}
+		if (passpos >= categories.get(catpos).getPasswords().size())
+		{
+			throw new InvalidInputException(passpos + "", "handleDeletePassword");
+		}
+		if (!daoPassword.checkSecret(secret, false))
 		{
 			throw new IncorrectSecretException();
 		}
-		
+
 		Category category = categories.get(catpos);
+		Password password = category.getPassword(passpos);
+		daoPassword.delete(password);
+		
 		category.getPasswords().remove(passpos);
-		callUpdateDatabase(secret);
 	}
 
 	/**
 	 * Chamada de atualização do banco de dados por meio do DAO.
 	 * 
+	 * @deprecated
 	 * @throws IOException
 	 * @throws UninitializedException
 	 */
+	@Deprecated
 	private void callUpdateDatabase(char[] secret) throws UninitializedException, Exception
 	{
-		dao.insertAll(categories, secret);
+		daoCategory.insertAll(categories);
 		updateView();
 	}
 
@@ -344,5 +398,21 @@ public class CategoryController implements InputHandler
 	public void updateView()
 	{
 		view.show(asStringHashMap());
+	}
+
+	/**
+	 * Exceção levantada quando algum entrada é dada como inválida.
+	 * 
+	 * @author Davi
+	 *
+	 */
+	public class InvalidInputException extends Exception
+	{
+		private static final long serialVersionUID = 5903355793672054387L;
+
+		public InvalidInputException(String input, String where)
+		{
+			super("Entrada \"" + input + "\" inválida em \n" + where + "\n.");
+		}
 	}
 }

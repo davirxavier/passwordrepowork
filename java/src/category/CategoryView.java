@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  * Classe de view, não documentada porque não importa muito pra esse trabalho.
  */
-public class CategoryView implements View
+public class CategoryView implements IView
 {
 	private InputHandler handler;
 	private static Scanner scanner;

@@ -6,16 +6,17 @@ import category.Category;
 import category.CategoryController;
 import category.CategoryView;
 import category.InputHandler;
-import category.View;
+import category.Password;
+import category.IView;
+import database.CategoryPasswordConnectionManager;
 import database.CategoryDAO;
-import database.CategoryDAO.UninitializedException;
-import database.fileManagers.DBFileManager;
-import database.fileManagers.DatabaseFileManager;
 import encrypters.AESEncrypter;
-import encrypters.Encrypter;
-import formatters.CategoryFormatter;
-import formatters.Formatter;
-import database.DAO;
+import encrypters.IEncrypter;
+import database.IDAO;
+import database.IDAOInner;
+import database.PasswordDAO;
+import database.Initializable.UninitializedException;
+import database.IConnectionManager;
 
 /**
  * Classe da aplicação, tem os objetos principais da aplicação e inicializa os
@@ -24,6 +25,7 @@ import database.DAO;
 public class Main
 {
 	private static final String DATABASE_PATH = "data.bin";
+	private static final String DATABASE_DB_URL = "jdbc:sqlite:" + DATABASE_PATH;
 	
 	/**
 	 * Inicializa as classes e o processo de troca de informações.
@@ -36,17 +38,19 @@ public class Main
 	public static void main(String[] args) throws UninitializedException, Exception
 	{
 		//Neccesários para o DAO
-		Encrypter encrypter = AESEncrypter.getInstance();
-		DBFileManager fileManager = new DatabaseFileManager(DATABASE_PATH, encrypter);
-		Formatter<Category> formatter = new CategoryFormatter();
+		IEncrypter encrypter = AESEncrypter.getInstance();
 		
 		//Inicializando DAO
-		DAO<Category> dao = CategoryDAO.getInstance();
-		dao.init(fileManager, formatter);
+		IConnectionManager manager = new CategoryPasswordConnectionManager();
+		IDAO<Category> daoCategory = CategoryDAO.getInstance();
+		daoCategory.init(manager);
+		
+		IDAOInner<Password, char[]> daoPassword = PasswordDAO.getInstance();
+		daoPassword.init(manager);
 		
 		//Inicializando view e controladora
-		View view = new CategoryView();
-		CategoryController controller = new CategoryController(view, dao);
+		IView view = new CategoryView();
+		CategoryController controller = new CategoryController(view, daoCategory, daoPassword);
 		view.setInputHandler(controller);
 		
 		//Iniciar view

@@ -3,15 +3,17 @@ package category;
 import java.util.*;
 
 import encrypters.AESEncrypter;
-import encrypters.Encrypter;
+import encrypters.IEncrypter;
 
 /**
- * Classe que serve com biblioteca de senhas.
+ * Classe que serve como biblioteca de senhas.
  */
 public class Category
 {
-	private static Encrypter encrypter = AESEncrypter.getInstance();
+	public static final int DEFAULT_ID = -1;
+	private static IEncrypter encrypter = AESEncrypter.getInstance();
 	private List<Password> pwds;
+	private int id;
 	private String name;
 
 	/**
@@ -21,11 +23,19 @@ public class Category
 	{
 		pwds = new ArrayList<Password>();
 		this.name = name;
+		this.id = DEFAULT_ID;
 	}
-	public Category(List<Password> list, String name)
+	public Category(String name, int id)
+	{
+		pwds = new ArrayList<Password>();
+		this.name = name;
+		this.id = id;
+	}
+	public Category(List<Password> list, int id, String name)
 	{
 		pwds = list;
 		this.name = name;
+		this.id = id;
 	}
 
 	/*
@@ -79,7 +89,6 @@ public class Category
 	public char[] getDecryptedPassword(int pos, char[] secret) throws Exception
 	{
 		Password password = pwds.get(pos);
-
 		char[] ret = encrypter.decrypt(password.getEncryptedPassword(), secret, true);
 		return ret;
 	}
@@ -97,7 +106,44 @@ public class Category
 		String encryptedpassword = encrypter.encrypt(password, secret, true);
 		p.setEncryptedPassword(encryptedpassword);
 	}
+	
+	/**
+	 * Retorna um Password na posição especificada em pos.
+	 * @param pos
+	 * @return
+	 */
+	public Password getPassword(int pos)
+	{
+		return pwds.get(pos);
+	}
+	
+	/**
+	 * Retorna um Password com o ID especificado ou null caso o mesmo não exista nessa categoria.
+	 * @param id
+	 * @return
+	 */
+	public Password getPasswordById(int id)
+	{
+		Password p = null;
+		for (Password password : pwds)
+		{
+			if (id == password.getId())
+			{
+				p = password;
+			}
+		}
+		
+		return p;
+	}
 
+	public int getId()
+	{
+		return id;
+	}
+	public void setId(int id)
+	{
+		this.id = id;
+	}
 	@Override
 	public boolean equals(Object obj)
 	{

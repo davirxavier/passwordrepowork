@@ -21,7 +21,7 @@ import javax.security.auth.DestroyFailedException;
  * Classe que criptografa e descriptografa texto usando o algoritmo AES.
  * Singleton.
  */
-public class AESEncrypter implements Encrypter
+public class AESEncrypter implements IEncrypter
 {
 
 	private static AESEncrypter instance;

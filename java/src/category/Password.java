@@ -4,18 +4,30 @@ import java.util.*;
 
 /**
  * Classe que guarda uma senha encriptada e informações referentes à mesma.
+ * Usar id = -1 para um valor padrão.
  */
 public class Password
 {
+	public static final int DEFAULT_ID = -1;
+	private int id;
 	private String description;
 	private String username;
 	private String encryptedPassword;
-
+	
 	public Password(String description, String username, String encryptedPassword)
 	{
 		this.description = description;
 		this.username = username;
 		this.encryptedPassword = encryptedPassword;
+		id = DEFAULT_ID;
+	}
+
+	public Password(int id, String description, String username, String encryptedPassword)
+	{
+		this.description = description;
+		this.username = username;
+		this.encryptedPassword = encryptedPassword;
+		this.id = id;
 	}
 
 	/*
@@ -50,6 +62,15 @@ public class Password
 	{
 		return description;
 	}
+	public int getId()
+	{
+		return id;
+	}
+
+	public void setId(int id)
+	{
+		this.id = id;
+	}
 	/*
 	 * 
 	 */
@@ -67,7 +88,7 @@ public class Password
 		{
 			Password password = (Password) obj;
 			return description.equals(password.description) && encryptedPassword.equals(password.encryptedPassword)
-					&& username.equals(password.username);
+					&& username.equals(password.username) && id == password.getId();
 		} else
 			return false;
 	}
