@@ -7,7 +7,7 @@ package database;
  * 
  * @author Davi
  *
- * @param <T>
+ * @param <T>: Tipo que deve ser passado na inicialização.
  */
 public interface Initializable<T>
 {

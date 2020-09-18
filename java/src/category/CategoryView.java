@@ -1,7 +1,9 @@
 package category;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 import exceptions.database.CategoryAlreadyExistsException;
 import exceptions.database.IncorrectSecretException;
@@ -12,7 +14,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  */
 public class CategoryView implements IView
 {
-	private InputHandler handler;
+	private CategoryInputHandler handler;
 	private static Scanner scanner;
 	private HashMap<String, List<String>> lastCategoriesHashMap;
 	private static final String DIVISOR_STRING = "------------------------------------------------------";
@@ -447,7 +449,7 @@ public class CategoryView implements IView
 		} while (true);
 	}
 
-	public void setInputHandler(InputHandler handler)
+	public void setInputHandler(CategoryInputHandler handler)
 	{
 		this.handler = handler;
 	}

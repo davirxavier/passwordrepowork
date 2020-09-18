@@ -13,6 +13,7 @@ import database.DatabaseConstants.CategoryConstants;
 
 /**
  * DAO para Category's.
+ * Para documentação de métodos ver IDAO.
  */
 public class CategoryDAO implements IDAO<Category>
 {
@@ -53,7 +54,7 @@ public class CategoryDAO implements IDAO<Category>
 	}
 
 	/**
-	 * Deve ser chamado antes da utilização dos métodos "getAll" e "insertAll".
+	 * Deve ser chamado antes da utilização dos métodos da classe.
 	 * 
 	 * @param DBFileManager
 	 * @param Formatter<Category
@@ -66,12 +67,6 @@ public class CategoryDAO implements IDAO<Category>
 		initialized = true;
 	}
 
-	/**
-	 * Retorna uma lista de todas as categorias do banco de dados.
-	 * 
-	 * @param secret - char[]: segredo para descriptografia do banco de dados.
-	 * @throws UninitializedException, Exception
-	 */
 	@Override
 	public List<Category> getAll() throws UninitializedException, Exception
 	{

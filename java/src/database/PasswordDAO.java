@@ -13,10 +13,9 @@ import encrypters.AESEncrypter;
 import encrypters.IEncrypter;
 
 /**
- * Dao para Passwords.
+ * Dao para Passwords. Para documentação de métodos ver IDAOInner.
  * 
  * @author Davi
- *
  */
 public class PasswordDAO implements IDAOInner<Password, char[]>
 {
@@ -258,15 +257,14 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 					statementRelation.setString(1, key);
 					statementRelation.setString(2, password.getId() + "");
 					statementRelation.addBatch();
-					
+
 					// Lógica caso algum Password seja fornecido sem um id definido.
 					if (password.getId() == PasswordDAO.DEFAULT_ID)
 					{
 						password.setId(newId);
 						statement.setInt(1, newId);
 						newId += 1;
-					} 
-					else
+					} else
 					{
 						statement.setInt(1, password.getId());
 					}

@@ -1,20 +1,14 @@
 package encrypters;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.DestroyFailedException;
 
 /**
@@ -26,7 +20,7 @@ public class AESEncrypter implements IEncrypter
 
 	private static AESEncrypter instance;
 	private static final char FILLCHAR = '\n';
-	
+
 	private SecretKeySpecDestroyable secretKey;
 	private byte[] key;
 
@@ -38,14 +32,15 @@ public class AESEncrypter implements IEncrypter
 		secretKey = null;
 		key = new byte[1];
 	}
-	
+
 	/**
 	 * Retorna uma instância da classe. Inicializa a classe se ainda for nula.
+	 * 
 	 * @return instance
 	 */
 	public static AESEncrypter getInstance()
 	{
-		if(instance == null)
+		if (instance == null)
 		{
 			synchronized (AESEncrypter.class)
 			{

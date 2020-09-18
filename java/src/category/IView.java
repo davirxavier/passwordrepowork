@@ -1,6 +1,7 @@
 package category;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Interface para mediação entre o CategoryController e CategoryView.
@@ -10,13 +11,15 @@ public interface IView
 
 	/**
 	 * Mostra as categorias passadas no hashmap.
+	 * 
 	 * @param c
 	 * @return
 	 */
 	public void show(HashMap<String, List<String>> c);
-	
+
 	/**
-	 * Retorna o segredo enviado pelo usuário. 
+	 * Retorna o segredo enviado pelo usuário.
+	 * 
 	 * @param textToShow
 	 * @return
 	 */
@@ -24,10 +27,11 @@ public interface IView
 
 	/**
 	 * Seta o controlador de entrada da view.
+	 * 
 	 * @param handler
 	 */
-	public void setInputHandler(InputHandler handler);
-	
+	public void setInputHandler(CategoryInputHandler handler);
+
 	/**
 	 * Começa o loop de ação principal da view.
 	 */

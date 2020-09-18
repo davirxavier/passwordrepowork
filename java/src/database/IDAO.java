@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * @author Davi
  * @implNote Implementa Initializable com um IConnectionManager.
- * @param <T>
+ * @param <T>: Entidade do DAO.
  */
 public interface IDAO<T> extends Initializable<IConnectionManager>
 {

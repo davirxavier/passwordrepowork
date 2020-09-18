@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.DESKeySpec;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
 
-/*
+/**
  * Classe para chave secreta customizada, retirada diretamente do código fonte
- * da JDK e modificada(depois da linha 216).
+ * da JDK e modificada(depois da linha 219).
+ * 
+ * @author Davi
  */
 public class SecretKeySpecDestroyable implements KeySpec, SecretKey, Destroyable
 {
@@ -21,7 +24,7 @@ public class SecretKeySpecDestroyable implements KeySpec, SecretKey, Destroyable
 	 * If the key is already destroyed.
 	 */
 	private boolean destroyed;
-	
+
 	/**
 	 * The secret key.
 	 *
@@ -212,7 +215,7 @@ public class SecretKeySpecDestroyable implements KeySpec, SecretKey, Destroyable
 
 		return java.util.Arrays.equals(this.key, thatKey);
 	}
-	
+
 	/*
 	 * Parte customizada
 	 */
@@ -224,11 +227,12 @@ public class SecretKeySpecDestroyable implements KeySpec, SecretKey, Destroyable
 	{
 		if (!destroyed)
 		{
-			Arrays.fill(key, (byte)0);
+			Arrays.fill(key, (byte) 0);
 			destroyed = true;
-		}
-		else throw new DestroyFailedException("Key already destroyed.");
+		} else
+			throw new DestroyFailedException("Key already destroyed.");
 	}
+
 	/**
 	 * Returns true if the key is destroyed.
 	 */

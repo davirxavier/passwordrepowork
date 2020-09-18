@@ -1,19 +1,23 @@
 package category;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-import database.CategoryDAO;
-import exceptions.database.CategoryAlreadyExistsException;
-import exceptions.database.IncorrectSecretException;
 import database.IDAO;
 import database.IDAOInner;
 import database.Initializable.UninitializedException;
+import exceptions.database.CategoryAlreadyExistsException;
+import exceptions.database.IncorrectSecretException;
 
 /**
+ * Controlador para Categorias.
  * 
+ * @implNote Implementa InputHandler para responder requisições da View.
  */
-public class CategoryController implements InputHandler
+public class CategoryController implements CategoryInputHandler
 {
 	private IDAO<Category> daoCategory;
 	private IDAOInner<Password, char[]> daoPassword;
@@ -23,7 +27,7 @@ public class CategoryController implements InputHandler
 	/**
 	 * Pergunta a view pelo segredo do usuário até o mesmo enviar o segredo correto.
 	 * Caso envie o segredo correto, pega a lista de categorias do dao. Dao e view
-	 * não podem ser nulos.
+	 * não podem ser nulos. Dao deve ter sido inicializado anteriormente.
 	 * 
 	 * @param view
 	 * @param dao
@@ -51,12 +55,6 @@ public class CategoryController implements InputHandler
 	/*
 	 * Setters e getters, nada de especial neles.
 	 */
-	/**
-	 * @param name
-	 * @param category
-	 * @param password
-	 * @return
-	 */
 	public void setPasswordUsername(String name, int category, int password)
 	{
 		Category c = categories.get(category);
@@ -64,12 +62,6 @@ public class CategoryController implements InputHandler
 		p.setUsername(name);
 	}
 
-	/**
-	 * @param desc
-	 * @param category
-	 * @param password
-	 * @return
-	 */
 	public void setPasswordDescription(String desc, int category, int password)
 	{
 		Category c = categories.get(category);
@@ -77,12 +69,6 @@ public class CategoryController implements InputHandler
 		p.setDescription(desc);
 	}
 
-	/**
-	 * @param encpass
-	 * @param category
-	 * @param password
-	 * @return
-	 */
 	public void setPasswordEncryptedPassword(String encpass, int category, int password)
 	{
 		Category c = categories.get(category);
@@ -90,10 +76,6 @@ public class CategoryController implements InputHandler
 		p.setEncryptedPassword(encpass);
 	}
 
-	/**
-	 * @param name
-	 * @return
-	 */
 	public void setCategoryName(String name, int catpos)
 	{
 		Category category = categories.get(catpos);
@@ -104,6 +86,9 @@ public class CategoryController implements InputHandler
 	{
 		return categories.get(catpos).getName();
 	}
+	/*
+	 * Fim dos getters e setters
+	 */
 
 	/**
 	 * Usa o método da categoria para retornar a senha descriptografada do password
@@ -117,9 +102,6 @@ public class CategoryController implements InputHandler
 		Category c = categories.get(category);
 		return c.getDecryptedPassword(password, secret);
 	}
-	/*
-	 * Fim dos getters e setters
-	 */
 
 	/**
 	 * Retorna a lista de categorias como um hashmap de strings. Para uso na view.
@@ -156,7 +138,8 @@ public class CategoryController implements InputHandler
 	 * @param passpos - int: Posição do Password na categoria.
 	 * @param secret  - char[]: Segredo para descriptografia.
 	 * @return char[]: Senha descriptografada, limpar quando não precisar mais.
-	 * @throws Exception
+	 * @throws InvalidInputException - Lançada quando passpos ou catpos são
+	 *                               inválidos.
 	 */
 	@Override
 	public char[] handleViewPassword(int catpos, int passpos, char[] secret) throws Exception
@@ -184,6 +167,8 @@ public class CategoryController implements InputHandler
 	 * @param newname - String: Novo nome para categoria.
 	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
 	 *                                  incorreto.
+	 * @throws InvalidInputException:   Lançada quando passpos ou catpos são
+	 *                                  inválidos.
 	 */
 	@Override
 	public void handleEditCategory(int catpos, String newname, char[] secret) throws Exception
@@ -211,7 +196,10 @@ public class CategoryController implements InputHandler
 	 * @param passuser - String
 	 * @param pass     - char[]
 	 * @param secret   - char[]
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
+	 * @throws InvalidInputException:   Lançada quando passpos ou catpos são
+	 *                                  inválidos.
 	 */
 	@Override
 	public void handleEditPassword(int catpos, int passpos, String passdesc, String passuser, char[] pass,
@@ -252,7 +240,7 @@ public class CategoryController implements InputHandler
 		{
 			Category category = categories.get(catpos);
 			Password password = category.getPassword(passpos);
-			
+
 			daoPassword.update(password.getId() + "", password);
 		}
 	}
@@ -262,7 +250,8 @@ public class CategoryController implements InputHandler
 	 * factory.
 	 * 
 	 * @param newname - String: Nome da nova categoria.
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
 	 */
 	@Override
 	public void handleNewCategory(String newname, char[] secret) throws Exception
@@ -293,7 +282,9 @@ public class CategoryController implements InputHandler
 	 * @param user   - String
 	 * @param pass   - char[]
 	 * @param secret - char[]
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
+	 * @throws InvalidInputException:   Lançada quando catpos é inválido.
 	 */
 	@Override
 	public void handleNewPassword(int catpos, String desc, String user, char[] pass, char[] secret) throws Exception
@@ -316,7 +307,9 @@ public class CategoryController implements InputHandler
 	 * Controla o evento de deletar uma categoria enviado pela view.
 	 * 
 	 * @param catpos - int: Número da categoria à ser deletada.
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
+	 * @throws InvalidInputException:   Lançada quando catpos é inválido.
 	 */
 	@Override
 	public void handleDeleteCategory(int catpos, char[] secret) throws Exception
@@ -340,7 +333,10 @@ public class CategoryController implements InputHandler
 	 * 
 	 * @param catpos  - int: Número da categoria da senha.
 	 * @param passpos - int: Posição da senha na categoria.
-	 * @throws Exception
+	 * @throws IncorretSecretException: Jogada quando o segredo é dado como
+	 *                                  incorreto.
+	 * @throws InvalidInputException:   Lançada quando passpos ou catpos são
+	 *                                  inválidos.
 	 */
 	@Override
 	public void handleDeletePassword(int catpos, int passpos, char[] secret) throws Exception
@@ -361,7 +357,7 @@ public class CategoryController implements InputHandler
 		Category category = categories.get(catpos);
 		Password password = category.getPassword(passpos);
 		daoPassword.delete(password);
-		
+
 		category.getPasswords().remove(passpos);
 	}
 
@@ -371,6 +367,7 @@ public class CategoryController implements InputHandler
 	 * @deprecated
 	 * @throws IOException
 	 * @throws UninitializedException
+	 * @deprecated
 	 */
 	@Deprecated
 	private void callUpdateDatabase(char[] secret) throws UninitializedException, Exception
@@ -401,10 +398,9 @@ public class CategoryController implements InputHandler
 	}
 
 	/**
-	 * Exceção levantada quando algum entrada é dada como inválida.
+	 * Exceção levantada quando alguma entrada é dada como inválida.
 	 * 
 	 * @author Davi
-	 *
 	 */
 	public class InvalidInputException extends Exception
 	{

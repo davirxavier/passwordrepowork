@@ -1,6 +1,7 @@
 package category;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import encrypters.AESEncrypter;
 import encrypters.IEncrypter;
@@ -52,6 +53,14 @@ public class Category
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	public int getId()
+	{
+		return id;
+	}
+	public void setId(int id)
+	{
+		this.id = id;
 	}
 	/*
 	 * 
@@ -136,14 +145,9 @@ public class Category
 		return p;
 	}
 
-	public int getId()
-	{
-		return id;
-	}
-	public void setId(int id)
-	{
-		this.id = id;
-	}
+	/**
+	 * Métodos de objeto.
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -154,7 +158,6 @@ public class Category
 		} else
 			return false;
 	}
-
 	@Override
 	public String toString()
 	{

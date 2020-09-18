@@ -58,5 +58,12 @@ public interface IDAOInner<T, S> extends Initializable<IConnectionManager>
 	 */
 	public boolean checkSecret(S s, boolean clear) throws UninitializedException, Exception;
 
+	/**
+	 * Deleta o T referenciado do banco de dados.
+	 * 
+	 * @param t
+	 * @throws UninitializedException
+	 * @throws Exception
+	 */
 	public void delete(T t) throws UninitializedException, Exception;
 }

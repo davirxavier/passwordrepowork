@@ -1,7 +1,5 @@
 package category;
 
-import java.util.*;
-
 /**
  * Classe que guarda uma senha encriptada e informações referentes à mesma.
  * Usar id = -1 para um valor padrão.
