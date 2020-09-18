@@ -1,7 +1,7 @@
-## Encrypted Password Repository App
+# Encrypted Password Repository App
 Encrypted password repository for university work. Uses Java 8.
 
-# Functionality: 
+### Functionality: 
 - Saves and views encrypted passwords with a master password.
 - A Password has three aatributes: 
   - Description - a note for that password.
