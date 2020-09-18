@@ -9,7 +9,7 @@ Encrypted password repository for university work. Uses Java 8. Code is commente
   - Encrypted Password - The string of characters containing the password text in an encrypted form.
 - Saves a Password inside a Category. Eg: "Google Accounts".
 - A Category has the attribute Name.
-- Console oriented (graphical interface using JavaFX anf JPhoenix libraries planned).
+- Console oriented (graphical interface using JavaFX and JPhoenix libraries planned).
 
 ### Classes Diagram 
 ![Classes Diagram](/classesdiagram.png)
