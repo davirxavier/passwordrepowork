@@ -8,13 +8,16 @@
     src: url('../../res/fonts/Roboto-Bold.ttf');
 }
 
+.root
+{
+	-fx-font-family: 'Roboto';
+}
+
 #primaryPane
 {
     -pcolor: #006064;
     -lcolor: #428e92;
     -dcolor: #00363a;
-
-	-fx-font: 12px 'Roboto';
 }
 
 .button-dark
@@ -22,6 +25,16 @@
 	-fx-background-color: -dcolor;
 	-fx-text-fill: white;
 	-jfx-rippler-fill: -lcolor;
+	
+	-fx-font-family: 'Roboto';
+}
+
+.button-transparent
+{
+	-fx-text-fill: white;
+	-jfx-rippler-fill: -lcolor;
+	
+	-fx-font-family: 'Roboto';
 }
 
 .textfield-dark
@@ -30,4 +43,47 @@
 	-jfx-unfocus-color: white;
 	-fx-text-fill: white;
 	-fx-prompt-text-fill: #c4c4c4;
+	
+	-fx-font-family: 'Roboto';
 }
+
+.split-pane *.split-pane-divider
+{
+    -fx-padding: 0 1 0 1;
+	-fx-background-color: transparent;
+}
+
+  /*
+  * JFX ListView 
+  */ 
+.list-view
+{
+    -fx-padding: 4px 0 0 0;
+    -fx-background-insets: 0;
+    -fx-background-color: lightgray;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+ .list-cell, .list-cell:hover, .list-cell:selected, .list-cell:selected:hover
+ {
+    -fx-background-color: white;
+    -fx-background-insets: 0 4px 4px 4px;
+    -fx-background-radius: 2px;
+    -fx-border-insets: 0 0 0 0;
+    -fx-border-radius: 0;
+    -fx-border-color: black;
+    -fx-border-width: 0;
+	-fx-text-fill: black;
+ }
+ 
+ .list-cell:empty 
+ {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+ }
+ .jfx-rippler 
+ {
+    -jfx-rippler-fill: lightgray;
+ }

@@ -72,4 +72,13 @@ public interface CategoryInputHandler
 	 * @param passpos - int: Posição da senha na categoria.
 	 */
 	public void handleDeletePassword(int catpos, int passpos, char[] secret) throws Exception;
+	
+	/**
+	 * Controla o evento de checar se o segredo enviado pela view está correto.
+	 * 
+	 * @param secret
+	 * @return boolean
+	 * @throws Exception
+	 */
+	public boolean handleCheckSecret(char[] secret) throws Exception;
 }

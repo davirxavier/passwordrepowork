@@ -245,6 +245,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			statement = connection.prepareStatement(sql);
 			statementRelation = connection.prepareStatement(sqlRelation);
 
+			boolean newConfirmed = false;
 			Iterator<String> keys = values.keySet().iterator();
 			while (keys.hasNext())
 			{
@@ -273,10 +274,15 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 					statement.setString(3, password.getUsername());
 					statement.setString(4, password.getEncryptedPassword());
 					statement.addBatch();
+					
+					newConfirmed = true;
 				}
 			}
-			statement.execute();
-			statementRelation.execute();
+			if (newConfirmed)
+			{
+				statement.execute();
+				statementRelation.execute();
+			}
 
 		} catch (Exception e)
 		{

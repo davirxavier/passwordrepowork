@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import category.view.IView;
 import database.IDAO;
 import database.IDAOInner;
 import database.Initializable.UninitializedException;
@@ -40,6 +39,7 @@ public class CategoryController implements CategoryInputHandler
 	{
 		this.view = view;
 		this.daoCategory = dao;
+		this.daoPassword = daoPassword;
 		this.categories = dao.getAll();
 
 //		while (true)
@@ -364,6 +364,24 @@ public class CategoryController implements CategoryInputHandler
 		daoPassword.delete(password);
 
 		category.getPasswords().remove(passpos);
+	}
+	
+	/**
+	 * Controla o evento de checar se o segredo enviado pela view está correto.
+	 * 
+	 * @param secret
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean handleCheckSecret(char[] secret) throws Exception
+	{
+		if (secret == null)
+		{
+			return false;
+		}
+		
+		return daoPassword.checkSecret(secret, false);
 	}
 
 	/**
