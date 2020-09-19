@@ -10,6 +10,8 @@ import java.util.List;
 import category.Category;
 import category.Password;
 import database.DatabaseConstants.CategoryConstants;
+import database.DatabaseConstants.PasswordConstants;
+import database.DatabaseConstants.RelationConstants;
 
 /**
  * DAO para Category's.
@@ -73,9 +75,16 @@ public class CategoryDAO implements IDAO<Category>
 		checkThrowException();
 
 		List<Category> categories = new ArrayList<>();
-		String sql = "SELECT passwords.id, " + "passwords.description, " + "passwords.password "
-				+ "FROM categories, passwords, category_password " + "WHERE category_password.id = ? "
-				+ "AND categories.id = ?;";
+		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "FROM " + CategoryConstants.categoryTable 
+					+ ", " + PasswordConstants.passwordTable 
+					+ ", " + RelationConstants.relationTable + " " 
+				+ "WHERE " + RelationConstants.relationTable + "." + RelationConstants.categoryColumn + " = ? "
+				+ "AND " + CategoryConstants.categoryTable + "." + CategoryConstants.idColumn + " = ? "
+				+ "AND " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
+						+ "= " + RelationConstants.relationTable + "." + RelationConstants.passwordColumn + ";";
 		String sqlCat = "SELECT * FROM categories;";
 
 		Connection connection = manager.getConnection();
@@ -120,7 +129,7 @@ public class CategoryDAO implements IDAO<Category>
 			if (statement != null)
 				statement.close();
 			if (statementCat != null)
-				statement.close();
+				statementCat.close();
 		}
 
 		return categories;
@@ -222,10 +231,16 @@ public class CategoryDAO implements IDAO<Category>
 	{
 		checkThrowException();
 
-		String sql = "SELECT passwords.id, " + "passwords.description, " + "passwords.username, "
-				+ "passwords.password " + "FROM categories, passwords, category_password "
-				+ "WHERE category_password.category_id = ? " + "AND categories.id = ? "
-				+ "AND passwords.id = category_password.password_id;";
+		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "FROM " + CategoryConstants.categoryTable 
+					+ ", " + PasswordConstants.passwordTable 
+					+ ", " + RelationConstants.relationTable + " " 
+				+ "WHERE " + RelationConstants.relationTable + "." + RelationConstants.categoryColumn + " = ? "
+				+ "AND " + CategoryConstants.categoryTable + "." + CategoryConstants.idColumn + " = ? "
+				+ "AND " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
+						+ "= " + RelationConstants.relationTable + "." + RelationConstants.passwordColumn + ";";
 		String sqlCat = "SELECT * FROM categories WHERE id = ?;";
 
 		Connection connection = manager.getConnection();

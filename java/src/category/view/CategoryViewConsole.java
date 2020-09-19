@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import category.CategoryInputHandler;
-import category.IView;
 import exceptions.database.CategoryAlreadyExistsException;
 import exceptions.database.IncorrectSecretException;
 import javafx.beans.property.SimpleIntegerProperty;

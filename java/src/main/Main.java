@@ -3,7 +3,7 @@ package main;
 import category.Category;
 import category.CategoryController;
 import category.view.CategoryViewGraphical;
-import category.IView;
+import category.view.IView;
 import category.Password;
 import database.CategoryDAO;
 import database.CategoryPasswordConnectionManager;
@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  */
 public class Main extends Application
 {
-	private static final String DATABASE_PATH = "data.bin";
+	private static final String DATABASE_PATH = "data.db";
 	private static final String DATABASE_DB_URL = "jdbc:sqlite:" + DATABASE_PATH;
 
 	/**
@@ -37,9 +37,10 @@ public class Main extends Application
 	 */
 	public static void main(String[] args) throws UninitializedException, Exception
 	{
-		// Inicializando DAOs
+		// Inicializando DAOs e DB
 		IConnectionManager manager = new CategoryPasswordConnectionManager();
 		manager.setURL(DATABASE_DB_URL);
+		manager.initDB();
 		IDAO<Category> daoCategory = CategoryDAO.getInstance();
 		daoCategory.init(manager);
 

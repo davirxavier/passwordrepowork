@@ -7,20 +7,22 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 
 import category.CategoryInputHandler;
-import category.IView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class CategoryViewGraphical implements IView
 {
+	private CategoryInputHandler inputHandler;
+	
     @FXML
     public AnchorPane primaryPane;
 
     @FXML
-    public AnchorPane loginPane;
+    public StackPane loginPane;
     
     @FXML
     public VBox loginInnerPane;
@@ -55,22 +57,18 @@ public class CategoryViewGraphical implements IView
 	@Override
 	public char[] askForSecret(String textToShow)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setInputHandler(CategoryInputHandler handler)
 	{
-		// TODO Auto-generated method stub
-		
+		this.inputHandler = handler;
 	}
 
 	@Override
 	public void startMainLoop()
 	{
 		// TODO Auto-generated method stub
-		
 	}
-    
 }
