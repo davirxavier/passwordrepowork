@@ -54,6 +54,8 @@ public class Main extends Application
 		// Iniciar view
 		controller.updateView();
 		view.startMainLoop();
+		
+		launch(args);
 	}
 
 	/**
