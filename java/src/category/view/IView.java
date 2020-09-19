@@ -1,7 +1,9 @@
-package category;
+package category.view;
 
 import java.util.HashMap;
 import java.util.List;
+
+import category.CategoryInputHandler;
 
 /**
  * Interface para mediação entre o CategoryController e CategoryView.

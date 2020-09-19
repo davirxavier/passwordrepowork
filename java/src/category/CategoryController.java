@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import category.view.IView;
 import database.IDAO;
 import database.IDAOInner;
 import database.Initializable.UninitializedException;
@@ -39,17 +40,21 @@ public class CategoryController implements CategoryInputHandler
 	{
 		this.view = view;
 		this.daoCategory = dao;
+		this.categories = dao.getAll();
 
-		while (true)
-		{
-			char[] secret = askViewForSecret("Insira sua senha mestra...");
-			boolean check = daoPassword.checkSecret(secret, true);
-			if (check)
-			{
-				categories = dao.getAll();
-				break;
-			}
-		}
+//		while (true)
+//		{
+//			char[] secret = askViewForSecret("Insira sua senha mestra...");
+//			if (secret == null)
+//				continue;
+//			
+//			boolean check = daoPassword.checkSecret(secret, true);
+//			if (check)
+//			{
+//				categories = dao.getAll();
+//				break;
+//			}
+//		}
 	}
 
 	/*
