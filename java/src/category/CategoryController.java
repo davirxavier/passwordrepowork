@@ -369,6 +369,7 @@ public class CategoryController implements CategoryInputHandler
 	 * @throws UninitializedException
 	 * @deprecated
 	 */
+	@SuppressWarnings("unused")
 	@Deprecated
 	private void callUpdateDatabase(char[] secret) throws UninitializedException, Exception
 	{

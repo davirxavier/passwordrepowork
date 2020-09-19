@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="primaryPane" prefHeight="480.0" prefWidth="640.0" style="-fx-font-family: Roboto-Regular;" stylesheets="@CategoryView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="category.view.CategoryViewGraphical">
+    <children>
+        <AnchorPane fx:id="loginPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: -dcolor;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox fx:id="loginInnerPane" alignment="CENTER" layoutX="270.0" layoutY="95.0" prefHeight="305.0" prefWidth="240.0" style="-fx-background-color: -pcolor; -fx-background-radius: 4px;" AnchorPane.bottomAnchor="95.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="95.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <children>
+                  <AnchorPane maxHeight="88.0" maxWidth="88.0" minHeight="88.0" minWidth="88.0" prefHeight="88.0" prefWidth="88.0" style="-fx-background-color: -dcolor; -fx-background-radius: 100px;">
+                     <VBox.margin>
+                        <Insets top="25.0" />
+                     </VBox.margin>
+                     <children>
+                        <ImageView fx:id="keyImg" fitHeight="64.0" fitWidth="64.0" layoutX="12.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="12.0">
+                           <image>
+                              <Image url="@../../res/img/key_white_96dp.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+                  <Label style="-fx-font: 16px &quot;Roboto Bold&quot;; -fx-text-fill: -dcolor;" text="EPR" textFill="#2a2a2a">
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin></Label>
+                  <Label style="-fx-font-size: 14px; -fx-text-fill: -dcolor;" text="Encrypted Password Repository" textFill="#2a2a2a" />
+                  <JFXPasswordField fx:id="loginPasswordField" maxWidth="190.0" onAction="#login" promptText="Senha mestra" styleClass="textfield-dark">
+                     <VBox.margin>
+                        <Insets bottom="20.0" top="35.0" />
+                     </VBox.margin>
+                  </JFXPasswordField>
+                  <JFXButton fx:id="loginButton" onAction="#login" styleClass="button-dark" text="Entrar">
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </JFXButton>
+               </children></VBox>
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

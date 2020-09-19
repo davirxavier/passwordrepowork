@@ -1,0 +1,33 @@
+@font-face 
+{
+    src: url('../../res/fonts/Roboto-Regular.ttf');
+}
+
+@font-face 
+{
+    src: url('../../res/fonts/Roboto-Bold.ttf');
+}
+
+#primaryPane
+{
+    -pcolor: #006064;
+    -lcolor: #428e92;
+    -dcolor: #00363a;
+
+	-fx-font: 12px 'Roboto';
+}
+
+.button-dark
+{
+	-fx-background-color: -dcolor;
+	-fx-text-fill: white;
+	-jfx-rippler-fill: -lcolor;
+}
+
+.textfield-dark
+{
+	-jfx-focus-color: -lcolor;
+	-jfx-unfocus-color: white;
+	-fx-text-fill: white;
+	-fx-prompt-text-fill: #c4c4c4;
+}

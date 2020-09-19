@@ -1,10 +1,12 @@
-package category;
+package category.view;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import category.CategoryInputHandler;
+import category.IView;
 import exceptions.database.CategoryAlreadyExistsException;
 import exceptions.database.IncorrectSecretException;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -12,14 +14,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  * Classe de view, não documentada porque não importa muito pra esse trabalho.
  */
-public class CategoryView implements IView
+public class CategoryViewConsole implements IView
 {
 	private CategoryInputHandler handler;
 	private static Scanner scanner;
 	private HashMap<String, List<String>> lastCategoriesHashMap;
 	private static final String DIVISOR_STRING = "------------------------------------------------------";
 
-	public CategoryView()
+	public CategoryViewConsole()
 	{
 		scanner = new Scanner(System.in);
 		lastCategoriesHashMap = new HashMap<>();
@@ -490,6 +492,7 @@ public class CategoryView implements IView
 		} while (true);
 	}
 
+	@SuppressWarnings("unchecked")
 	private int getPassCount(int catpos)
 	{
 		return ((List<String>) lastCategoriesHashMap.values().toArray()[catpos]).size();
@@ -501,6 +504,7 @@ public class CategoryView implements IView
 		Object[] array = lastCategoriesHashMap.values().toArray();
 		for (int i = 0; i < array.length; i++)
 		{
+			@SuppressWarnings("unchecked")
 			List<String> list = (List<String>) array[i];
 			ret += list.size();
 		}

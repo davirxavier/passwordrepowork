@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="org.json.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/org.json.jar!/"/>
+	</lib>
+	<lib name="sqlite-jdbc-3.32.3.2.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/sqlite-jdbc-3.32.3.2.jar!/"/>
+	</lib>
+	<lib name="mockito-all-1.10.19.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/mockito-all-1.10.19.jar!/"/>
+	</lib>
+</component>
