@@ -19,11 +19,16 @@ import category.view.nodes.CategoryListCell;
 import category.view.nodes.FlatJFXDialog;
 import category.view.nodes.SearchBar;
 import exceptions.database.IncorrectSecretException;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.PathTransition;
+import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -32,7 +37,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.util.Callback;
+import javafx.util.Duration;
 
 /**
  * View para categorias e passwords em interface gráfica.
@@ -73,6 +80,9 @@ public class CategoryViewGraphical implements IView
 
 	@FXML
 	private JFXListView<CategoryHandlerResponse> categoriesListView;
+
+	@FXML
+	private AnchorPane leftPasswordsPane;
 
 	public CategoryViewGraphical()
 	{
@@ -164,10 +174,11 @@ public class CategoryViewGraphical implements IView
 					if (check)
 					{
 						loginLabelError.setVisible(false);
-						loginPane.setVisible(false);
 						loginPane.setDisable(true);
 						passwordsPane.setVisible(true);
 						loginPane.getChildren().remove(spinner);
+
+						playLoginAnimation();
 					} else
 					{
 						loginPane.setDisable(false);
@@ -189,10 +200,36 @@ public class CategoryViewGraphical implements IView
 			}
 		}).start();
 	}
-	
+
 	private void playLoginAnimation()
 	{
-		
+		FadeTransition fadeTransition = new FadeTransition();
+		fadeTransition.setNode(loginInnerPane);
+		fadeTransition.setDuration(Duration.seconds(0.17));
+		fadeTransition.setFromValue(1);
+		fadeTransition.setToValue(0);
+
+		PathTransition pathTransition = new PathTransition();
+		pathTransition.setNode(loginPane);
+		pathTransition.setDuration(Duration.seconds(0.4));
+
+		Line line = new Line();
+		Bounds paneBounds = loginPane.localToScene(loginPane.getBoundsInLocal());
+		line.setStartX(paneBounds.getMinX() + paneBounds.getWidth() / 2);
+		line.setStartY(paneBounds.getMinY() + paneBounds.getHeight() / 2);
+		line.setEndX(0 - paneBounds.getWidth() / 2);
+		line.setEndY(line.getStartY());
+
+		pathTransition.setPath(line);
+
+		FadeTransition fadeTransition2 = new FadeTransition();
+		fadeTransition2.setNode(leftPasswordsPane);
+		fadeTransition2.setDuration(Duration.seconds(0.10));
+		fadeTransition2.setFromValue(0);
+		fadeTransition2.setToValue(1);
+
+		SequentialTransition transition = new SequentialTransition(fadeTransition, pathTransition, fadeTransition2);
+		transition.play();
 	}
 
 	@FXML
@@ -200,15 +237,40 @@ public class CategoryViewGraphical implements IView
 	{
 		categoriesListView.getItems().clear();
 		categoriesListView.refresh();
-		
-		passwordsPane.setVisible(false);
-		loginPane.setVisible(true);
+
 		loginPane.setDisable(false);
+		playLogoutAnimation();
 	}
-	
+
 	private void playLogoutAnimation()
 	{
-		
+		FadeTransition fadeTransition = new FadeTransition();
+		fadeTransition.setNode(loginInnerPane);
+		fadeTransition.setDuration(Duration.seconds(0.17));
+		fadeTransition.setFromValue(0);
+		fadeTransition.setToValue(1);
+
+		PathTransition pathTransition = new PathTransition();
+		pathTransition.setNode(loginPane);
+		pathTransition.setDuration(Duration.seconds(0.4));
+
+		Line line = new Line();
+		Bounds paneBounds = loginPane.localToScene(loginPane.getBoundsInLocal());
+		line.setEndX(loginPane.getScene().getWidth()/2);
+		line.setEndY(paneBounds.getMinY() + paneBounds.getHeight() / 2);
+		line.setStartX(0 - paneBounds.getWidth() / 2);
+		line.setStartY(line.getEndY());
+
+		pathTransition.setPath(line);
+
+		FadeTransition fadeTransition2 = new FadeTransition();
+		fadeTransition2.setNode(leftPasswordsPane);
+		fadeTransition2.setDuration(Duration.seconds(0.10));
+		fadeTransition2.setFromValue(1);
+		fadeTransition2.setToValue(0);
+
+		SequentialTransition transition = new SequentialTransition(fadeTransition2, pathTransition, fadeTransition);
+		transition.play();
 	}
 
 	@FXML
@@ -486,5 +548,5 @@ public class CategoryViewGraphical implements IView
 	{
 		// TODO Auto-generated method stub
 	}
-	
+
 }
