@@ -2,8 +2,7 @@ package main;
 
 import category.Category;
 import category.CategoryController;
-import category.view.CategoryViewGraphical;
-import category.view.IView;
+import category.IView;
 import category.Password;
 import database.CategoryDAO;
 import database.CategoryPasswordConnectionManager;
@@ -26,6 +25,8 @@ public class Main extends Application
 {
 	private static final String DATABASE_PATH = "data.db";
 	private static final String DATABASE_DB_URL = "jdbc:sqlite:" + DATABASE_PATH;
+	private static IView view;
+	private static Parent fxRoot;
 
 	/**
 	 * Inicializa as classes e o processo de troca de informações.
@@ -37,6 +38,11 @@ public class Main extends Application
 	 */
 	public static void main(String[] args) throws UninitializedException, Exception
 	{
+		//Inicializando a janela do JavaFX
+		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/category/view/CategoryView.fxml"));
+		fxRoot = loader.load();
+		view = loader.getController();
+		
 		// Inicializando DAOs e DB
 		IConnectionManager manager = new CategoryPasswordConnectionManager();
 		manager.setURL(DATABASE_DB_URL);
@@ -48,7 +54,6 @@ public class Main extends Application
 		daoPassword.init(manager);
 
 		// Inicializando view e controladora
-		IView view = new CategoryViewGraphical();
 		CategoryController controller = new CategoryController(view, daoCategory, daoPassword);
 		view.setInputHandler(controller);
 
@@ -65,8 +70,7 @@ public class Main extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		Parent root = FXMLLoader.load(getClass().getResource("../category/view/CategoryView.fxml"));
-		primaryStage.setScene(new Scene(root));
+		primaryStage.setScene(new Scene(fxRoot));
 		primaryStage.setTitle(TextConstants.nameShort + " - " + TextConstants.nameLong);
 		primaryStage.show();
 	}

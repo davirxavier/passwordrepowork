@@ -77,7 +77,8 @@ public class CategoryDAO implements IDAO<Category>
 		List<Category> categories = new ArrayList<>();
 		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
 				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
-				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + ", "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.usernameColumn + " "
 				+ "FROM " + CategoryConstants.categoryTable 
 					+ ", " + PasswordConstants.passwordTable 
 					+ ", " + RelationConstants.relationTable + " " 
@@ -112,7 +113,7 @@ public class CategoryDAO implements IDAO<Category>
 					String description = resultSetPass
 							.getString(DatabaseConstants.PasswordConstants.descriptionColumn.getString());
 					String username = resultSetPass
-							.getString(DatabaseConstants.PasswordConstants.usernameColumn.getString());
+							.getString(PasswordConstants.usernameColumn.getString());
 					String ppassword = resultSetPass
 							.getString(DatabaseConstants.PasswordConstants.passwordColumn.getString());
 
@@ -139,6 +140,8 @@ public class CategoryDAO implements IDAO<Category>
 	public void insertAll(List<Category> categories) throws UninitializedException, Exception
 	{
 		checkThrowException();
+		if (categories.size() == 0)
+			return;
 
 		String sql = "REPLACE INTO " + DatabaseConstants.CategoryConstants.categoryTable.getString() + "("
 				+ DatabaseConstants.CategoryConstants.idColumn + ", " + DatabaseConstants.CategoryConstants.nameColumn
@@ -171,6 +174,7 @@ public class CategoryDAO implements IDAO<Category>
 			statement = connection.prepareStatement(sql);
 			statementRelation = connection.prepareStatement(sqlRelation);
 
+			boolean newRelation = false;
 			for (Category category : categories)
 			{
 				// Lógica caso alguma categoria seja fornecida sem um id definido.
@@ -192,11 +196,16 @@ public class CategoryDAO implements IDAO<Category>
 					statementRelation.setInt(1, category.getId());
 					statementRelation.setInt(2, password.getId());
 					statementRelation.addBatch();
+					
+					newRelation = true;
 				}
 
 			}
 
-			statement.execute();
+			if (newRelation)
+			{
+				statement.execute();
+			}
 			statementRelation.execute();
 
 			HashMap<String, List<Password>> passwords = new HashMap<>();
@@ -233,7 +242,8 @@ public class CategoryDAO implements IDAO<Category>
 
 		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
 				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
-				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + ", "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.usernameColumn + " "
 				+ "FROM " + CategoryConstants.categoryTable 
 					+ ", " + PasswordConstants.passwordTable 
 					+ ", " + RelationConstants.relationTable + " " 
@@ -300,7 +310,7 @@ public class CategoryDAO implements IDAO<Category>
 		String sql = "INSERT INTO " + CategoryConstants.categoryTable.getString() + "(" + CategoryConstants.idColumn
 				+ ", " + CategoryConstants.nameColumn + ") " + "VALUES(?, ?);";
 
-		String sqlRelation = "REPLACE INTO " + DatabaseConstants.RelationConstants.relationTable + "("
+		String sqlRelation = "INSERT INTO " + DatabaseConstants.RelationConstants.relationTable + "("
 				+ DatabaseConstants.RelationConstants.categoryColumn + ", "
 				+ DatabaseConstants.RelationConstants.passwordColumn + ") " + "VALUES(?, ?);";
 
@@ -335,14 +345,17 @@ public class CategoryDAO implements IDAO<Category>
 			statement.execute();
 			statement.close();
 
-			statement = connection.prepareStatement(sqlRelation);
-			for (Password password : category.getPasswords())
+			if (category.getPasswords().size() > 0)
 			{
-				statement.setInt(1, category.getId());
-				statement.setInt(2, password.getId());
-				statement.addBatch();
+				statement = connection.prepareStatement(sqlRelation);
+				for (Password password : category.getPasswords())
+				{
+					statement.setInt(1, category.getId());
+					statement.setInt(2, password.getId());
+					statement.addBatch();
+				}
+				statement.execute();
 			}
-			statement.execute();
 
 			HashMap<String, List<Password>> passwords = new HashMap<>();
 			passwords.put(category.getId() + "", category.getPasswords());

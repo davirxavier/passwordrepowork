@@ -1,9 +1,7 @@
-package category.view;
+package category;
 
 import java.util.HashMap;
 import java.util.List;
-
-import category.CategoryInputHandler;
 
 /**
  * Interface para mediação entre o CategoryController e CategoryView.
@@ -17,7 +15,7 @@ public interface IView
 	 * @param c
 	 * @return
 	 */
-	public void show(HashMap<String, List<String>> c);
+	public void show(List<CategoryHandlerResponse> reses);
 
 	/**
 	 * Retorna o segredo enviado pelo usuário.
