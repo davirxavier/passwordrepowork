@@ -2,6 +2,7 @@ package category.view.nodes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import com.jfoenix.controls.JFXButton;
@@ -16,6 +17,7 @@ import category.view.HSpacer;
 import category.view.ToolbarButton;
 import exceptions.database.IncorrectSecretException;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,6 +35,9 @@ import res.img.ImagePath;
 
 public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 {
+	//Tracks which cell is expanded by its category's id
+	private static HashMap<Integer, Boolean> expanded_list = new HashMap<>();
+	
 	// nodes
 	private ToolbarButton deleteButton;
 	private ToolbarButton editButton;
@@ -44,14 +49,14 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 
 	// data
 	private CategoryHandlerResponse currentNode;
-	private boolean expanded;
+	private SimpleBooleanProperty expanded;
 	private CategoryInputHandler inputHandler;
 
 	public CategoryListCell()
 	{
 		super();
 
-		expanded = false;
+		expanded = new SimpleBooleanProperty(false);
 		init();
 	}
 
@@ -68,7 +73,7 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 		mainVBox.setFillWidth(true);
 		mainVBox.setSpacing(8);
 		mainVBox.setStyle("-fx-padding: 0 0 6px 2px;");
-
+		
 		passwordNodes = new ArrayList<>();
 		setOnMouseClicked((e) ->
 		{
@@ -83,7 +88,15 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 			}
 
 			setExpanded(!isExpanded());
-
+		});
+		
+		expanded.addListener(c ->
+		{
+			if (currentNode != null)
+			{
+				expanded_list.put(currentNode.getCatId(), isExpanded());
+			}
+			
 			if (isExpanded())
 			{
 				arrow.setImage(arrowLess);
@@ -91,6 +104,7 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 			{
 				arrow.setImage(arrowMore);
 			}
+			updateItem(currentNode, isEmpty());
 		});
 	}
 
@@ -108,6 +122,16 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 			return;
 		}
 		this.currentNode = node;
+		
+		if (expanded_list.containsKey(currentNode.getCatId()))
+		{
+			boolean expanded = expanded_list.get(currentNode.getCatId());
+			if (expanded != isExpanded())
+			{
+				setExpanded(expanded);
+				return;
+			}
+		}
 
 		HBox hbox1 = new HBox();
 		hbox1.setAlignment(Pos.CENTER);
@@ -181,13 +205,12 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 
 	public boolean isExpanded()
 	{
-		return expanded;
+		return expanded.get();
 	}
 
 	public void setExpanded(boolean expand)
 	{
-		this.expanded = expand;
-		updateItem(currentNode, isEmpty());
+		this.expanded.set(expand);
 	}
 
 	public void setInputHandler(CategoryInputHandler inputHandler)

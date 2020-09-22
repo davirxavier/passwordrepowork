@@ -20,7 +20,6 @@ import category.view.nodes.FlatJFXDialog;
 import category.view.nodes.SearchBar;
 import exceptions.database.IncorrectSecretException;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -33,7 +32,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.util.Callback;
 
 /**
@@ -84,17 +82,18 @@ public class CategoryViewGraphical implements IView
 	@FXML
 	void initialize()
 	{
-		categoriesListView.setCellFactory(new Callback<ListView<CategoryHandlerResponse>, ListCell<CategoryHandlerResponse>>()
-		{
-			@Override
-			public ListCell<CategoryHandlerResponse> call(ListView<CategoryHandlerResponse> param)
-			{
-				CategoryListCell cell = new CategoryListCell();
-				cell.setInputHandler(inputHandler);
+		categoriesListView
+				.setCellFactory(new Callback<ListView<CategoryHandlerResponse>, ListCell<CategoryHandlerResponse>>()
+				{
+					@Override
+					public ListCell<CategoryHandlerResponse> call(ListView<CategoryHandlerResponse> param)
+					{
+						CategoryListCell cell = new CategoryListCell();
+						cell.setInputHandler(inputHandler);
 
-				return cell;
-			}
-		});
+						return cell;
+					}
+				});
 
 		SearchBar searchBar = new SearchBar();
 		searchBar.setPrefHeight(30);
@@ -115,13 +114,26 @@ public class CategoryViewGraphical implements IView
 
 			Platform.runLater(() ->
 			{
-				List<CategoryHandlerResponse> nodes = categoriesListView.getItems().filtered(node -> node.getCategoryName()
-						.toLowerCase().contains(searchBar.getTextField().getText().toLowerCase()));
+				List<CategoryHandlerResponse> nodes = categoriesListView.getItems().filtered(node -> node
+						.getCategoryName().toLowerCase().contains(searchBar.getTextField().getText().toLowerCase()));
 				categoriesListView.setItems(FXCollections.observableArrayList(nodes));
 				categoriesListView.refresh();
 
 				lastSearch.set(searchBar.getTextField().getText());
 			});
+		});
+		searchBar.getClearButton().setOnAction(e ->
+		{
+			searchBar.getTextField().clear();
+			try
+			{
+				inputHandler.handleRequestUpdate();
+			} catch (Exception e1)
+			{
+				e1.printStackTrace();
+			}
+
+			categoriesListView.refresh();
 		});
 
 		categoryListPane.getChildren().add(searchBar);
@@ -172,7 +184,7 @@ public class CategoryViewGraphical implements IView
 	@FXML
 	void logout(ActionEvent event)
 	{
-		
+
 	}
 
 	@FXML
@@ -315,6 +327,21 @@ public class CategoryViewGraphical implements IView
 		catList.setMinHeight(120);
 		catList.getStyleClass().add("select-jfx-list");
 		catList.getItems().addAll(lastEntries);
+		catList.setCellFactory(lv -> new JFXListCell<CategoryHandlerResponse>()
+		{
+			@Override
+			protected void updateItem(CategoryHandlerResponse item, boolean empty)
+			{
+				super.updateItem(item, empty);
+				if (empty || item == null)
+				{
+					setText("");
+				} else
+				{
+					setText(item.getCategoryName());
+				}
+			}
+		});
 
 		buttonYes.setOnAction(e ->
 		{
@@ -346,7 +373,7 @@ public class CategoryViewGraphical implements IView
 				dialog.setHeader("Processing...");
 				dialog.getLayout().getBody().clear();
 				dialog.getLayout().setBody(new JFXSpinner());
-				
+
 				new Thread(() ->
 				{
 					errorLabel.setVisible(false);
