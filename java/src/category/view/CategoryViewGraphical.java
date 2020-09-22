@@ -147,11 +147,17 @@ public class CategoryViewGraphical implements IView
 	{
 		char[] secret = loginPasswordField.getText().toCharArray();
 
+		loginPane.setDisable(true);
+		JFXSpinner spinner = new JFXSpinner();
+		spinner.setMaxHeight(80);
+		spinner.setMaxWidth(80);
+		loginPane.getChildren().add(spinner);
 		new Thread(() ->
 		{
 			try
 			{
 				boolean check = inputHandler.handleCheckSecret(secret);
+				inputHandler.handleRequestUpdate();
 
 				Platform.runLater(() ->
 				{
@@ -161,8 +167,11 @@ public class CategoryViewGraphical implements IView
 						loginPane.setVisible(false);
 						loginPane.setDisable(true);
 						passwordsPane.setVisible(true);
+						loginPane.getChildren().remove(spinner);
 					} else
 					{
+						loginPane.setDisable(false);
+						loginPane.getChildren().remove(spinner);
 						loginLabelError.setText("Senha mestra incorreta.");
 						loginLabelError.setVisible(true);
 					}
@@ -180,11 +189,26 @@ public class CategoryViewGraphical implements IView
 			}
 		}).start();
 	}
+	
+	private void playLoginAnimation()
+	{
+		
+	}
 
 	@FXML
 	void logout(ActionEvent event)
 	{
-
+		categoriesListView.getItems().clear();
+		categoriesListView.refresh();
+		
+		passwordsPane.setVisible(false);
+		loginPane.setVisible(true);
+		loginPane.setDisable(false);
+	}
+	
+	private void playLogoutAnimation()
+	{
+		
 	}
 
 	@FXML
@@ -462,4 +486,5 @@ public class CategoryViewGraphical implements IView
 	{
 		// TODO Auto-generated method stub
 	}
+	
 }

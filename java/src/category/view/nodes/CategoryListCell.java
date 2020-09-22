@@ -288,6 +288,9 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 
 						buttonNo.setText("Close");
 						buttonYes.setText("Confirm changes");
+						JFXButton buttonDelete = new JFXButton("Delete Password");
+						buttonDelete.getStyleClass().addAll(buttonYes.getStyleClass());
+						dialog.getLayout().getActions().add(0, buttonDelete);
 						
 						dialog.getDialog().setOnDialogClosed(closed ->
 						{
@@ -295,6 +298,61 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 							Arrays.fill(secret, (char)0);
 							Arrays.fill(secretc, (char)0);
 							Arrays.fill(decryptedPassword, (char)0);
+						});
+						
+						buttonDelete.setOnAction(eventDelete ->
+						{
+							dialog.setHeader("Confirm your choice");
+							dialog.setBody("Do you really want to delete this password?");
+							buttonNo.setText("No");
+							buttonYes.setText("Yes");
+							buttonDelete.setVisible(false);
+							
+							buttonYes.setOnAction(eventYesDelete ->
+							{
+								dialog.setHeader("Processing...");
+								dialog.getLayout().setBody(new JFXSpinner());
+								
+								new Thread(() ->
+								{
+									try
+									{
+										inputHandler.handleDeletePassword(catid, passid, secretc);
+										Platform.runLater(() ->
+										{
+											dialog.setHeader("Success");
+											dialog.setBody("Password deleted successfully.");
+											
+											buttonYes.setVisible(false);
+											buttonDelete.setVisible(false);
+											buttonNo.setText("Close");
+										});
+									} 
+									catch (Exception e1)
+									{
+										e1.printStackTrace();
+										Platform.runLater(() ->
+										{
+											dialog.setHeader("Error");
+											dialog.setBody("There was an error deleting the password, try again.");
+											
+											buttonYes.setVisible(false);
+											buttonDelete.setVisible(false);
+											buttonNo.setText("Close");
+										});
+									}
+									finally 
+									{
+										Arrays.fill(secret, (char) 0);
+										Arrays.fill(secretc, (char) 0);
+										passField.clear();
+									}
+								}).start();
+							});
+							buttonNo.setOnAction(eventNoDelete ->
+							{
+								dialog.getDialog().close();
+							});
 						});
 
 						buttonYes.setOnAction(eventChanges ->
