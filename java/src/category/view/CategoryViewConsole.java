@@ -1,10 +1,12 @@
 package category.view;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import category.CategoryHandlerResponse;
 import category.CategoryInputHandler;
 import category.IView;
 import exceptions.database.CategoryAlreadyExistsException;
@@ -18,13 +20,13 @@ public class CategoryViewConsole implements IView
 {
 	private CategoryInputHandler handler;
 	private static Scanner scanner;
-	private HashMap<String, List<String>> lastCategoriesHashMap;
+	private List<CategoryHandlerResponse> lastResponses;
 	private static final String DIVISOR_STRING = "------------------------------------------------------";
 
 	public CategoryViewConsole()
 	{
 		scanner = new Scanner(System.in);
-		lastCategoriesHashMap = new HashMap<>();
+		lastResponses = new ArrayList<>();
 	}
 
 	/**
@@ -32,31 +34,26 @@ public class CategoryViewConsole implements IView
 	 * @return
 	 */
 	@Override
-	public void show(HashMap<String, List<String>> categoryPassword)
+	public void show(List<CategoryHandlerResponse> responses)
 	{
 		cls();
 
-		lastCategoriesHashMap = categoryPassword;
+		lastResponses = responses;
 
 		System.out.println(DIVISOR_STRING);
 		System.out.println("| Categorias e senhas");
 		System.out.println(DIVISOR_STRING);
 
-		SimpleIntegerProperty catNum = new SimpleIntegerProperty(0);
-		categoryPassword.forEach((k, v) ->
+		responses.forEach(v ->
 		{
-			System.out.println("| " + catNum.get() + " - " + k + ":");
+			System.out.println("| " + v.getCatId() + " - " + v.getCategoryName() + ":");
 
-			SimpleIntegerProperty passNum = new SimpleIntegerProperty(0);
-			v.forEach(s ->
+			v.getPasswords().forEach(s ->
 			{
-				System.out.println("  |_ " + passNum.get() + " - " + s);
-				passNum.set(passNum.get() + 1);
+				System.out.println("  |_ " + s);
 			});
-
-			catNum.set(catNum.get() + 1);
 		});
-		if (categoryPassword.isEmpty())
+		if (responses.isEmpty())
 		{
 			System.out.println("| Vazio");
 		}
@@ -104,7 +101,7 @@ public class CategoryViewConsole implements IView
 						try
 						{
 							int catpos = parseNumber("Insira a categoria onde a senha se encontra: ");
-							if (catpos < 0 || catpos >= lastCategoriesHashMap.size())
+							if (catpos < 0 || catpos >= lastResponses.size())
 							{
 								System.out.println("Essa categoria não existe. Tente novamente...");
 								continue;
@@ -132,7 +129,7 @@ public class CategoryViewConsole implements IView
 									System.out.println(DIVISOR_STRING);
 									waitScanner();
 									cls();
-									show(lastCategoriesHashMap);
+									show(lastResponses);
 									return;
 								} catch (IncorrectSecretException e)
 								{
@@ -157,7 +154,7 @@ public class CategoryViewConsole implements IView
 					do
 					{
 						int catpos = parseNumber("Insira o número da categoria desejada:");
-						if (catpos < 0 || catpos >= lastCategoriesHashMap.size())
+						if (catpos < 0 || catpos >= lastResponses.size())
 						{
 							System.out.println("Essa categoria não existe. Tente novamente...");
 							continue;
@@ -177,7 +174,7 @@ public class CategoryViewConsole implements IView
 							String choice = scanner.nextLine();
 							if (!choice.isEmpty() && (choice.charAt(0) == 'n' || choice.charAt(0) == 'N'))
 							{
-								show(lastCategoriesHashMap);
+								show(lastResponses);
 								return;
 							}
 
@@ -200,7 +197,7 @@ public class CategoryViewConsole implements IView
 				case 3:
 					do
 					{
-						if (lastCategoriesHashMap.size() == 0)
+						if (lastResponses.size() == 0)
 						{
 							System.out.println("Você não criou nenhuma categoria ainda!");
 							return;
@@ -227,7 +224,7 @@ public class CategoryViewConsole implements IView
 							try
 							{
 								catpos = Integer.parseInt(catposString);
-								if (catpos < 0 || catpos > lastCategoriesHashMap.size() - 1)
+								if (catpos < 0 || catpos > lastResponses.size() - 1)
 								{
 									System.out.println("Categoria inexistente! Tente novamente...");
 									continue;
@@ -302,7 +299,7 @@ public class CategoryViewConsole implements IView
 					do
 					{
 						int catpos = parseNumber("Insira o número da categoria desejada:");
-						if (catpos < 0 || catpos >= lastCategoriesHashMap.size())
+						if (catpos < 0 || catpos >= lastResponses.size())
 						{
 							System.out.println("Essa categoria não existe. Tente novamente...");
 							continue;
@@ -314,7 +311,7 @@ public class CategoryViewConsole implements IView
 						String choice = scanner.nextLine();
 						if (!choice.isEmpty() && (choice.charAt(0) == 'n' || choice.charAt(0) == 'N'))
 						{
-							show(lastCategoriesHashMap);
+							show(lastResponses);
 							return;
 						}
 
@@ -344,10 +341,10 @@ public class CategoryViewConsole implements IView
 						int catpos = parseNumber("Insira o número da categoria que você deseja editar(-1 para cancelar):");
 						if (catpos == -1)
 						{
-							show(lastCategoriesHashMap);
+							show(lastResponses);
 							return;
 						}
-						if (catpos < 0 || catpos >= lastCategoriesHashMap.size())
+						if (catpos < 0 || catpos >= lastResponses.size())
 						{
 							System.out.println("Essa categoria não existe. Tente novamente...");
 							continue;
@@ -388,10 +385,10 @@ public class CategoryViewConsole implements IView
 						int catpos = parseNumber("Insira o número da categoria desejada(-1 para cancelar):");
 						if (catpos == -1) 
 						{
-							show(lastCategoriesHashMap);
+							show(lastResponses);
 							return;
 						}
-						if (catpos < 0 || catpos >= lastCategoriesHashMap.size())
+						if (catpos < 0 || catpos >= lastResponses.size())
 						{
 							System.out.println("Essa categoria não existe. Tente novamente...");
 							continue;
@@ -400,7 +397,7 @@ public class CategoryViewConsole implements IView
 						int passpos = parseNumber("Insira o número da senha desejada(-1 para cancelar):");
 						if (passpos == -1)
 						{
-							show(lastCategoriesHashMap);
+							show(lastResponses);
 							return;
 						}
 						if(passpos < 0 || passpos >= getPassCount(catpos))
@@ -495,18 +492,24 @@ public class CategoryViewConsole implements IView
 	@SuppressWarnings("unchecked")
 	private int getPassCount(int catpos)
 	{
-		return ((List<String>) lastCategoriesHashMap.values().toArray()[catpos]).size();
+		for (int i = 0; i < lastResponses.size(); i++)
+		{
+			CategoryHandlerResponse r = lastResponses.get(i);
+			if (r.getCatId() == catpos)
+			{
+				return r.getPasswords().size();
+			}
+		}
+		
+		return -1;
 	}
 
 	private int getAllPassCount()
 	{
 		int ret = 0;
-		Object[] array = lastCategoriesHashMap.values().toArray();
-		for (int i = 0; i < array.length; i++)
+		for (CategoryHandlerResponse response : lastResponses)
 		{
-			@SuppressWarnings("unchecked")
-			List<String> list = (List<String>) array[i];
-			ret += list.size();
+			ret += lastResponses.size();
 		}
 
 		return ret;
@@ -518,7 +521,7 @@ public class CategoryViewConsole implements IView
 		{
 			System.out.println("Você não adicionou nenhuma senha ainda!");
 			waitScanner();
-			show(lastCategoriesHashMap);
+			show(lastResponses);
 			return false;
 		}
 		return true;
@@ -526,11 +529,11 @@ public class CategoryViewConsole implements IView
 	
 	private boolean checkForCategories()
 	{
-		if (lastCategoriesHashMap.size() == 0)
+		if (lastResponses.size() == 0)
 		{
 			System.out.println("Você ainda não adicionou nenhuma categoria!");
 			waitScanner();
-			show(lastCategoriesHashMap);
+			show(lastResponses);
 			return false;
 		}
 		return true;

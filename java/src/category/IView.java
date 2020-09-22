@@ -15,7 +15,7 @@ public interface IView
 	 * @param c
 	 * @return
 	 */
-	public void show(HashMap<String, List<String>> c);
+	public void show(List<CategoryHandlerResponse> reses);
 
 	/**
 	 * Retorna o segredo enviado pelo usuário.

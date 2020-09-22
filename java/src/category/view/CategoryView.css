@@ -47,6 +47,16 @@
 	-fx-font-family: 'Roboto';
 }
 
+.textfield-light
+{
+	-jfx-focus-color: -dcolor;
+	-jfx-unfocus-color: gray;
+	-fx-text-fill: black;
+	-fx-prompt-text-fill: #c4c4c4;
+	
+	-fx-font-family: 'Roboto';
+}
+
 .split-pane *.split-pane-divider
 {
     -fx-padding: 0 1 0 1;
@@ -58,7 +68,7 @@
   */ 
 .list-view
 {
-    -fx-padding: 4px 0 0 0;
+    -fx-padding: 6px 0 0 0;
     -fx-background-insets: 0;
     -fx-background-color: lightgray;
     -fx-border-radius: 0;
@@ -68,13 +78,14 @@
  .list-cell, .list-cell:hover, .list-cell:selected, .list-cell:selected:hover
  {
     -fx-background-color: white;
-    -fx-background-insets: 0 4px 4px 4px;
+    -fx-background-insets: 0 6px 6px 6px;
     -fx-background-radius: 2px;
     -fx-border-insets: 0 0 0 0;
     -fx-border-radius: 0;
     -fx-border-color: black;
     -fx-border-width: 0;
 	-fx-text-fill: black;
+	-fx-effect: dropshadow(three-pass-box, black, 3, 0, 1, 1);
  }
  
  .list-cell:empty 
@@ -87,3 +98,66 @@
  {
     -jfx-rippler-fill: lightgray;
  }
+
+.jfx-button.searchBarButton > .jfx-rippler
+{
+	-jfx-rippler-fill: gray;
+}
+
+.select-jfx-list .list-cell:selected
+{
+	-fx-background-color: -lcolor;
+	-fx-text-fill: white;
+}
+
+/*
+  * Scrollbars 
+  */
+  /* The main scrollbar CSS class of ListView */
+.scroll-bar:horizontal ,
+.scroll-bar:vertical{
+    -fx-background-color:transparent;
+ 
+}
+ 
+/* The increment and decrement button CSS class of scrollbar */
+.increment-button ,.jfx-list-view .decrement-button {
+    -fx-background-color:transparent;
+	-fx-border-color:derive(gray,80%);
+}
+ 
+/* The main scrollbar **track** CSS class  */
+.scroll-bar:horizontal .track ,
+.scroll-bar:vertical .track{
+     -fx-background-color: transparent;
+	 -fx-border-color:derive(gray,80%);
+	 -fx-background-radius: 0em;
+}
+ 
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color:derive(#3a3a3a,60%);
+	-fx-background-insets: 0, 0, 0;
+	-fx-background-radius: 0em;
+ 
+}
+.scroll-bar:horizontal:hover .track ,
+.scroll-bar:horizontal:pressed .track ,
+.scroll-bar:vertical:hover .track,
+.scroll-bar:vertical:pressed .track{
+     -fx-background-color: derive(#3a3a3a,-40%);
+ 
+	 -fx-opacity: 0.2;
+	 -fx-background-radius: 0em;
+ 
+}
+/* The main scrollbar **thumb** CSS class on event of "hover" and "pressed" */
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed{
+    -fx-background-color: derive(black,50%);
+}
+.increment-button:hover , .decrement-button:hover {
+    -fx-background-color:derive(gray,100%);
+	-fx-border-color:derive(gray,80%);	
+}

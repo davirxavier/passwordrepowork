@@ -77,7 +77,8 @@ public class CategoryDAO implements IDAO<Category>
 		List<Category> categories = new ArrayList<>();
 		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
 				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
-				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + ", "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.usernameColumn + " "
 				+ "FROM " + CategoryConstants.categoryTable 
 					+ ", " + PasswordConstants.passwordTable 
 					+ ", " + RelationConstants.relationTable + " " 
@@ -112,7 +113,7 @@ public class CategoryDAO implements IDAO<Category>
 					String description = resultSetPass
 							.getString(DatabaseConstants.PasswordConstants.descriptionColumn.getString());
 					String username = resultSetPass
-							.getString(DatabaseConstants.PasswordConstants.usernameColumn.getString());
+							.getString(PasswordConstants.usernameColumn.getString());
 					String ppassword = resultSetPass
 							.getString(DatabaseConstants.PasswordConstants.passwordColumn.getString());
 
@@ -241,7 +242,8 @@ public class CategoryDAO implements IDAO<Category>
 
 		String sql = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + ", " 
 				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.descriptionColumn + ", " 
-				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + " "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.passwordColumn + ", "
+				+ "" + PasswordConstants.passwordTable + "." + PasswordConstants.usernameColumn + " "
 				+ "FROM " + CategoryConstants.categoryTable 
 					+ ", " + PasswordConstants.passwordTable 
 					+ ", " + RelationConstants.relationTable + " " 
@@ -308,7 +310,7 @@ public class CategoryDAO implements IDAO<Category>
 		String sql = "INSERT INTO " + CategoryConstants.categoryTable.getString() + "(" + CategoryConstants.idColumn
 				+ ", " + CategoryConstants.nameColumn + ") " + "VALUES(?, ?);";
 
-		String sqlRelation = "REPLACE INTO " + DatabaseConstants.RelationConstants.relationTable + "("
+		String sqlRelation = "INSERT INTO " + DatabaseConstants.RelationConstants.relationTable + "("
 				+ DatabaseConstants.RelationConstants.categoryColumn + ", "
 				+ DatabaseConstants.RelationConstants.passwordColumn + ") " + "VALUES(?, ?);";
 

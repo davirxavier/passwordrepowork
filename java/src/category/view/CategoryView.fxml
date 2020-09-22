@@ -15,7 +15,7 @@
 
 <AnchorPane fx:id="primaryPane" prefHeight="480.0" prefWidth="640.0" stylesheets="@CategoryView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="category.view.CategoryViewGraphical">
     <children>
-      <StackPane fx:id="passwordsPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <StackPane fx:id="passwordsPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <SplitPane dividerPositions="0.28" prefHeight="160.0" prefWidth="200.0" style="-fx-background-color: -dcolor;">
               <items>
@@ -52,7 +52,7 @@
                         </JFXButton>
                      </children>
                   </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: white;">
+                <AnchorPane fx:id="categoryListPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: lightgray;">
                      <children>
                         <JFXListView fx:id="categoriesListView" layoutX="85.0" layoutY="29.0" prefHeight="449.0" prefWidth="458.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="-0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                      </children>
@@ -61,7 +61,7 @@
             </SplitPane>
          </children>
       </StackPane>
-      <StackPane fx:id="loginPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: -dcolor;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <StackPane fx:id="loginPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: -dcolor;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
                 <VBox fx:id="loginInnerPane" alignment="CENTER" maxHeight="305.0" maxWidth="240.0" prefHeight="305.0" prefWidth="240.0" style="-fx-background-color: -pcolor; -fx-background-radius: 4px;">
                <opaqueInsets>

@@ -97,7 +97,7 @@ public class Password
 	@Override
 	public String toString()
 	{
-		return description + "," + username + ",\"" + encryptedPassword + "\"";
+		return id + "," + description + "," + username + "," + encryptedPassword + "";
 	}
 
 }

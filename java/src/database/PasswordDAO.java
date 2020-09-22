@@ -69,7 +69,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				+ DatabaseConstants.PasswordConstants.descriptionColumn + " = ?, "
 				+ DatabaseConstants.PasswordConstants.usernameColumn + "= ?, "
 				+ DatabaseConstants.PasswordConstants.passwordColumn + "= ? " + "WHERE "
-				+ DatabaseConstants.PasswordConstants.idColumn + " = ? LIMIT 1;";
+				+ DatabaseConstants.PasswordConstants.idColumn + " = ?;";
 
 		Connection connection = manager.getConnection();
 		PreparedStatement statement = null;
@@ -109,15 +109,13 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 	{
 		checkThrowException();
 
-		String sql = "SELECT * FROM " + DatabaseConstants.PasswordConstants.passwordTable + " " + "WHERE "
-				+ DatabaseConstants.PasswordConstants.idColumn + " = ?;";
+		String sql = "SELECT * FROM " + DatabaseConstants.PasswordConstants.passwordTable + " LIMIT 1;";
 
 		Connection connection = manager.getConnection();
 		PreparedStatement statement = null;
 		try
 		{
 			statement = connection.prepareStatement(sql);
-			statement.setString(1, "1");
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next())
 			{
@@ -175,7 +173,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				ResultSet resultSet = statement.executeQuery();
 				if (resultSet.next())
 				{
-					newId = resultSet.getInt("maxid") + 1;
+					newId = resultSet.getInt("maxid") + 2;
 				}
 				statement.close();
 

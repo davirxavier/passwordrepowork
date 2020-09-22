@@ -3,7 +3,6 @@ package main;
 import category.Category;
 import category.CategoryController;
 import category.IView;
-import category.view.CategoryViewGraphical;
 import category.Password;
 import database.CategoryDAO;
 import database.CategoryPasswordConnectionManager;
