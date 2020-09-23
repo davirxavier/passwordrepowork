@@ -76,6 +76,7 @@ public class Main extends Application
 		primaryStage.setTitle(TextConstants.nameShort + " - " + TextConstants.nameLong);
 		primaryStage.setTitle("EPR - Encrypted Password Repository");
 		primaryStage.getIcons().add(new Image(ImagePath.APPICON.getPath()));
+		primaryStage.setMaximized(true);
 		primaryStage.show();
 	}
 }

@@ -196,6 +196,11 @@ public class CategoryViewGraphical implements IView
 			{
 				e.printStackTrace();
 			}
+			finally
+			{
+				Arrays.fill(secret, (char)0);
+				loginPasswordField.clear();
+			}
 		}).start();
 	}
 
@@ -227,6 +232,10 @@ public class CategoryViewGraphical implements IView
 		fadeTransition2.setToValue(1);
 
 		SequentialTransition transition = new SequentialTransition(fadeTransition, pathTransition, fadeTransition2);
+		transition.setOnFinished(e ->
+		{
+			loginPane.setVisible(false);
+		});
 		transition.play();
 	}
 
@@ -237,6 +246,7 @@ public class CategoryViewGraphical implements IView
 		categoriesListView.refresh();
 
 		loginPane.setDisable(false);
+		loginPane.setVisible(true);
 		playLogoutAnimation();
 	}
 
