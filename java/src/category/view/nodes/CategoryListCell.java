@@ -114,6 +114,13 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 				deleteCategoryDialog(currentNode.getCatId());
 			}
 		});
+		editButton.setOnAction(e ->
+		{
+			if (currentNode != null)
+			{
+				editCategoryDialog(currentNode.getCatId());
+			}
+		});
 	}
 
 	@Override
@@ -224,6 +231,112 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 	public void setInputHandler(CategoryInputHandler inputHandler)
 	{
 		this.inputHandler = inputHandler;
+	}
+	
+	private void editCategoryDialog(int catid)
+	{
+		JFXButton buttonYes = new JFXButton("Confirm");
+		JFXButton buttonNo = new JFXButton("Close");
+		buttonNo.getStyleClass().add("button-dark");
+		buttonYes.getStyleClass().addAll(buttonNo.getStyleClass());
+
+		StackPane mainPane = (StackPane) getScene().lookup("#passwordsPane");
+		FlatJFXDialog dialog = new FlatJFXDialog(mainPane, "New Category", "", buttonNo, buttonYes);
+
+		Label nameLabel = new Label("Modify the name of the Category (50 characters): ");
+		JFXTextField nameField = new JFXTextField();
+		nameField.setPromptText("Name");
+		nameField.getStyleClass().add("textfield-light");
+		nameField.textProperty().addListener((c, oldval, newval) ->
+		{
+			if (newval.length() > 50)
+			{
+				nameField.setText(oldval);
+			}
+		});
+		nameField.setText(currentNode.getCategoryName());
+
+		Label passLabel = new Label("Insert your master password:");
+		JFXPasswordField passField = new JFXPasswordField();
+		passField.setPromptText("Master password");
+		passField.getStyleClass().add("textfield-light");
+
+		nameLabel.setStyle("-fx-font-size: 12px;");
+		passLabel.setStyle(nameLabel.getStyle());
+		
+		Label errorLabel = new Label("Error");
+		errorLabel.setTextFill(Color.RED);
+		errorLabel.setVisible(false);
+		errorLabel.setStyle("-fx-font-size: 12px;");
+
+		VBox vBox = new VBox(nameLabel, nameField, passLabel, passField, errorLabel);
+		vBox.setSpacing(8);
+
+		buttonYes.setOnAction(e ->
+		{
+			if (nameField.getText().isEmpty())
+			{
+				errorLabel.setText("Name field is empty.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			char[] secret = passField.getText().toCharArray();
+			try
+			{
+				if (!inputHandler.handleCheckSecret(secret))
+				{
+					errorLabel.setText("Incorrect master password, try again.");
+					errorLabel.setVisible(true);
+					return;
+				}
+			} 
+			catch (Exception e2)
+			{
+				e2.printStackTrace();
+				errorLabel.setText("Error checking your master password, try again.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			errorLabel.setVisible(false);
+			
+			Platform.runLater(() ->
+			{
+				dialog.getLayout().getBody().clear();
+				dialog.setHeader("Processing...");
+				dialog.getLayout().setBody(new JFXSpinner());
+			});
+
+			new Thread(() ->
+			{
+				try
+				{
+					inputHandler.handleEditCategory(catid, nameField.getText(), secret);
+
+					Platform.runLater(() ->
+					{
+						dialog.setHeader("Success");
+						dialog.setBody("Category modified successfully.");
+
+						buttonYes.setVisible(false);
+					});
+				} catch (Exception e1)
+				{
+					e1.printStackTrace();
+					dialog.getDialog().close();
+				} finally
+				{
+					passField.clear();
+					Arrays.fill(secret, (char)0);
+				}
+			}).start();
+		});
+		buttonNo.setOnAction(e ->
+		{
+			dialog.getDialog().close();
+		});
+
+		dialog.getLayout().setBody(vBox);
+		dialog.getDialog().show();
 	}
 
 	private void deleteCategoryDialog(int catid)
