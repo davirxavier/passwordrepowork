@@ -310,12 +310,42 @@ public class CategoryViewGraphical implements IView
 
 		nameLabel.setStyle("-fx-font-size: 12px;");
 		passLabel.setStyle(nameLabel.getStyle());
+		
+		Label errorLabel = new Label("Error");
+		errorLabel.setTextFill(Color.RED);
+		errorLabel.setVisible(false);
+		errorLabel.setStyle("-fx-font-size: 12px;");
 
-		VBox vBox = new VBox(nameLabel, nameField, passLabel, passField);
+		VBox vBox = new VBox(nameLabel, nameField, passLabel, passField, errorLabel);
 		vBox.setSpacing(8);
 
 		buttonYes.setOnAction(e ->
 		{
+			if (nameField.getText().isEmpty())
+			{
+				errorLabel.setText("Name field is empty.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			char[] secret = passField.getText().toCharArray();
+			try
+			{
+				if (!inputHandler.handleCheckSecret(secret))
+				{
+					errorLabel.setText("Incorrect master password, try again.");
+					errorLabel.setVisible(true);
+					return;
+				}
+			} 
+			catch (Exception e2)
+			{
+				e2.printStackTrace();
+				errorLabel.setText("Error checking your master password, try again.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			errorLabel.setVisible(false);
+			
 			Platform.runLater(() ->
 			{
 				dialog.getLayout().getBody().clear();
@@ -327,22 +357,12 @@ public class CategoryViewGraphical implements IView
 			{
 				try
 				{
-					inputHandler.handleNewCategory(nameField.getText(), passField.getText().toCharArray());
+					inputHandler.handleNewCategory(nameField.getText(), secret);
 
 					Platform.runLater(() ->
 					{
 						dialog.setHeader("Success");
 						dialog.setBody("Category inserted successfully.");
-
-						buttonYes.setVisible(false);
-					});
-				} catch (IncorrectSecretException incorrectE)
-				{
-					incorrectE.printStackTrace();
-					Platform.runLater(() ->
-					{
-						dialog.setHeader("Errorr");
-						dialog.setBody("Incorrect master password, try again.");
 
 						buttonYes.setVisible(false);
 					});
@@ -353,6 +373,7 @@ public class CategoryViewGraphical implements IView
 				} finally
 				{
 					passField.clear();
+					Arrays.fill(secret, (char)0);
 				}
 			}).start();
 		});
