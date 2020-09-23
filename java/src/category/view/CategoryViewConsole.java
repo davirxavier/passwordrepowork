@@ -2,7 +2,6 @@ package category.view;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,7 +10,6 @@ import category.CategoryInputHandler;
 import category.IView;
 import exceptions.database.CategoryAlreadyExistsException;
 import exceptions.database.IncorrectSecretException;
-import javafx.beans.property.SimpleIntegerProperty;
 
 /**
  * Classe de view, não documentada porque não importa muito pra esse trabalho.

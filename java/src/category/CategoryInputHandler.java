@@ -1,8 +1,5 @@
 package category;
 
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * Interface para intermediação entre o CategoryController e CategoryView.
  */

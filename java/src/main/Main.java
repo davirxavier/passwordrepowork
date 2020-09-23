@@ -15,7 +15,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import res.img.ImagePath;
 
 /**
  * Classe da aplicação, tem os objetos principais da aplicação e inicializa os
@@ -72,6 +74,9 @@ public class Main extends Application
 	{
 		primaryStage.setScene(new Scene(fxRoot));
 		primaryStage.setTitle(TextConstants.nameShort + " - " + TextConstants.nameLong);
+		primaryStage.setTitle("EPR - Encrypted Password Repository");
+		primaryStage.getIcons().add(new Image(ImagePath.APPICON.getPath()));
+		primaryStage.setMaximized(true);
 		primaryStage.show();
 	}
 }

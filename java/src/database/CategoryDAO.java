@@ -155,6 +155,7 @@ public class CategoryDAO implements IDAO<Category>
 				+ CategoryConstants.categoryTable + ";";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		PreparedStatement statementRelation = null;
 		try
@@ -213,9 +214,15 @@ public class CategoryDAO implements IDAO<Category>
 			{
 				passwords.put(category.getId() + "", category.getPasswords());
 			}
+			
 			PASSWORD_DAO.insertAll(passwords);
+			connection.commit();
 		} catch (Exception e)
 		{
+			if (!connection.getAutoCommit())
+			{
+				connection.rollback();
+			}
 			throw e;
 		} finally
 		{
@@ -318,6 +325,7 @@ public class CategoryDAO implements IDAO<Category>
 				+ CategoryConstants.categoryTable + ";";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -360,8 +368,13 @@ public class CategoryDAO implements IDAO<Category>
 			HashMap<String, List<Password>> passwords = new HashMap<>();
 			passwords.put(category.getId() + "", category.getPasswords());
 			PASSWORD_DAO.insertAll(passwords);
+			connection.commit();
 		} catch (Exception e)
 		{
+			if (!connection.getAutoCommit())
+			{
+				connection.rollback();
+			}
 			throw e;
 		} finally
 		{
@@ -381,13 +394,11 @@ public class CategoryDAO implements IDAO<Category>
 		String sqlRelation = "DELETE FROM " + DatabaseConstants.RelationConstants.relationTable + " " + "WHERE "
 				+ DatabaseConstants.RelationConstants.categoryColumn + " = ?;";
 		// Será completada mais na frente utilizando a resposta da "sqlQuery"
-		String sqlDeletePass = "DELETE FROM " + DatabaseConstants.PasswordConstants.passwordTable + " " + "WHERE "
-				+ DatabaseConstants.PasswordConstants.idColumn + " IN (";
-		String sqlQuery = "SELECT passwords.id " + "FROM categories, passwords, category_password "
-				+ "WHERE category_password.category_id = ? " + "AND categories.id = ? "
-				+ "AND passwords.id = category_password.password_id;";
+		String sqlDeletePass = "DELETE FROM " + PasswordConstants.passwordTable + " " + "WHERE "
+				+ PasswordConstants.idColumn + " IN (";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -400,28 +411,17 @@ public class CategoryDAO implements IDAO<Category>
 			}
 			statement.close();
 
-			statement = connection.prepareStatement(sqlQuery);
-			statement.setInt(1, t.getId());
-			statement.setInt(2, t.getId());
-
-			ResultSet resultSet = statement.executeQuery();
-			List<Integer> ids = new ArrayList<>();
-			while (resultSet.next())
-			{
-				ids.add(resultSet.getInt(DatabaseConstants.PasswordConstants.idColumn.toString()));
-			}
-
-			for (int id : ids)
+			for (Password p : t.getPasswords())
 			{
 				sqlDeletePass += "?,";
 			}
-			sqlDeletePass = sqlDeletePass.substring(0, sqlDeletePass.length()) + "-1);";
+			sqlDeletePass = sqlDeletePass + "-1);";
 
 			statement.close();
 			statement = connection.prepareStatement(sqlDeletePass);
-			for (int i = 0; i < ids.size(); i++)
+			for (int i = 0; i < t.getPasswords().size(); i++)
 			{
-				statement.setInt(i + 1, ids.get(i));
+				statement.setInt(i + 1, t.getPasswords().get(i).getId());
 			}
 			statement.execute();
 			statement.close();
@@ -429,8 +429,11 @@ public class CategoryDAO implements IDAO<Category>
 			statement = connection.prepareStatement(sqlRelation);
 			statement.setInt(1, t.getId());
 			statement.execute();
+			
+			connection.commit();
 		} catch (Exception e)
 		{
+			connection.rollback();
 			throw e;
 		} finally
 		{

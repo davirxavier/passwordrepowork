@@ -3,12 +3,15 @@ package database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import category.Password;
 import database.DatabaseConstants.CategoryConstants;
+import database.DatabaseConstants.PasswordConstants;
+import database.DatabaseConstants.RelationConstants;
 import encrypters.AESEncrypter;
 import encrypters.IEncrypter;
 
@@ -138,6 +141,10 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 		{
 			if (statement != null)
 				statement.close();
+			if (clearSecret)
+			{
+				Arrays.fill(secret, (char)0);
+			}
 		}
 	}
 
@@ -146,20 +153,21 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 	{
 		checkThrowException();
 
-		String sql = "INSERT INTO " + DatabaseConstants.PasswordConstants.passwordTable + " ("
-				+ DatabaseConstants.PasswordConstants.idColumn + ","
-				+ DatabaseConstants.PasswordConstants.descriptionColumn + ","
-				+ DatabaseConstants.PasswordConstants.usernameColumn + ","
-				+ DatabaseConstants.PasswordConstants.passwordColumn + ")" + " VALUES (?, ?, ?, ?);";
+		String sql = "INSERT INTO " + PasswordConstants.passwordTable + " ("
+				+ PasswordConstants.idColumn + ","
+				+ PasswordConstants.descriptionColumn + ","
+				+ PasswordConstants.usernameColumn + ","
+				+ PasswordConstants.passwordColumn + ")" + " VALUES (?, ?, ?, ?);";
 
-		String sqlRelation = "INSERT INTO " + DatabaseConstants.RelationConstants.relationTable + " ("
-				+ DatabaseConstants.RelationConstants.categoryColumn + ", "
-				+ DatabaseConstants.RelationConstants.passwordColumn + ")" + " VALUES(?, ?)";
+		String sqlRelation = "INSERT INTO " + RelationConstants.relationTable + " ("
+				+ RelationConstants.categoryColumn + ", "
+				+ RelationConstants.passwordColumn + ")" + " VALUES(?, ?)";
 
-		String sqlId = "SELECT IFNULL(MAX(" + CategoryConstants.idColumn + "), 1) as maxid " + "FROM "
-				+ CategoryConstants.categoryTable + ";";
+		String sqlId = "SELECT IFNULL(MAX(" + PasswordConstants.idColumn + "), 1) as maxid " + "FROM "
+				+ PasswordConstants.passwordTable + ";";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -173,8 +181,9 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				ResultSet resultSet = statement.executeQuery();
 				if (resultSet.next())
 				{
-					newId = resultSet.getInt("maxid") + 2;
+					newId = resultSet.getInt("maxid") + 1;
 				}
+				resultSet.close();
 				statement.close();
 
 				t.setId(newId);
@@ -194,8 +203,11 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			statement.setString(4, t.getEncryptedPassword());
 
 			statement.execute();
+			
+			connection.commit();
 		} catch (Exception e)
 		{
+			connection.rollback();
 			throw e;
 		} finally
 		{
@@ -307,6 +319,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				+ DatabaseConstants.RelationConstants.passwordColumn + " = ?;";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -318,6 +331,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			statement = connection.prepareStatement(sqlRelation);
 			statement.setInt(1, t.getId());
 			statement.execute();
+			connection.commit();
 
 			if (statement.getUpdateCount() == 0)
 			{
@@ -325,6 +339,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			}
 		} catch (Exception e)
 		{
+			connection.rollback();
 			throw e;
 		} finally
 		{

@@ -2,7 +2,6 @@ package category.view;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import com.jfoenix.controls.JFXButton;
@@ -19,12 +18,15 @@ import category.view.nodes.CategoryListCell;
 import category.view.nodes.FlatJFXDialog;
 import category.view.nodes.SearchBar;
 import exceptions.database.IncorrectSecretException;
+import javafx.animation.FadeTransition;
+import javafx.animation.PathTransition;
+import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -33,8 +35,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import javafx.scene.shape.Line;
 import javafx.util.Callback;
+import javafx.util.Duration;
 
 /**
  * View para categorias e passwords em interface gráfica.
@@ -45,6 +48,7 @@ public class CategoryViewGraphical implements IView
 {
 	private CategoryInputHandler inputHandler;
 	private List<CategoryHandlerResponse> lastEntries;
+	private boolean checkAccess;
 
 	@FXML
 	public AnchorPane primaryPane;
@@ -76,25 +80,30 @@ public class CategoryViewGraphical implements IView
 	@FXML
 	private JFXListView<CategoryHandlerResponse> categoriesListView;
 
+	@FXML
+	private AnchorPane leftPasswordsPane;
+
 	public CategoryViewGraphical()
 	{
 		lastEntries = new ArrayList<CategoryHandlerResponse>();
+		checkAccess = false;
 	}
 
 	@FXML
 	void initialize()
 	{
-		categoriesListView.setCellFactory(new Callback<ListView<CategoryHandlerResponse>, ListCell<CategoryHandlerResponse>>()
-		{
-			@Override
-			public ListCell<CategoryHandlerResponse> call(ListView<CategoryHandlerResponse> param)
-			{
-				CategoryListCell cell = new CategoryListCell();
-				cell.setInputHandler(inputHandler);
+		categoriesListView
+				.setCellFactory(new Callback<ListView<CategoryHandlerResponse>, ListCell<CategoryHandlerResponse>>()
+				{
+					@Override
+					public ListCell<CategoryHandlerResponse> call(ListView<CategoryHandlerResponse> param)
+					{
+						CategoryListCell cell = new CategoryListCell();
+						cell.setInputHandler(inputHandler);
 
-				return cell;
-			}
-		});
+						return cell;
+					}
+				});
 
 		SearchBar searchBar = new SearchBar();
 		searchBar.setPrefHeight(30);
@@ -115,13 +124,26 @@ public class CategoryViewGraphical implements IView
 
 			Platform.runLater(() ->
 			{
-				List<CategoryHandlerResponse> nodes = categoriesListView.getItems().filtered(node -> node.getCategoryName()
-						.toLowerCase().contains(searchBar.getTextField().getText().toLowerCase()));
+				List<CategoryHandlerResponse> nodes = categoriesListView.getItems().filtered(node -> node
+						.getCategoryName().toLowerCase().contains(searchBar.getTextField().getText().toLowerCase()));
 				categoriesListView.setItems(FXCollections.observableArrayList(nodes));
 				categoriesListView.refresh();
 
 				lastSearch.set(searchBar.getTextField().getText());
 			});
+		});
+		searchBar.getClearButton().setOnAction(e ->
+		{
+			searchBar.getTextField().clear();
+			try
+			{
+				inputHandler.handleRequestUpdate();
+			} catch (Exception e1)
+			{
+				e1.printStackTrace();
+			}
+
+			categoriesListView.refresh();
 		});
 
 		categoryListPane.getChildren().add(searchBar);
@@ -130,27 +152,59 @@ public class CategoryViewGraphical implements IView
 		AnchorPane.setRightAnchor(searchBar, 0.0);
 	}
 
+	private void firstAccessDialog()
+	{
+		String header = "Important Information";
+		String body = "As this is your first time accessing the app, the Master\n"
+				+ "Password asked won't be checked until you create your first Password.\n\n"
+				+ "Be sure to pay attention when creating your first password,\n"
+				+ "as the Master Password you use when creating it will be used\n"
+				+ "globally and permanently.";
+
+		JFXButton button = new JFXButton("I understand");
+		button.getStyleClass().add("button-dark");
+		
+		FlatJFXDialog dialog = new FlatJFXDialog(loginPane, header, body, button);
+		
+		button.setOnAction(e ->
+		{
+			dialog.getDialog().close();
+		});
+		
+		dialog.getDialog().show();
+	}
+
 	@FXML
 	void login(ActionEvent event)
 	{
 		char[] secret = loginPasswordField.getText().toCharArray();
 
+		loginPane.setDisable(true);
+		JFXSpinner spinner = new JFXSpinner();
+		spinner.setMaxHeight(80);
+		spinner.setMaxWidth(80);
+		loginPane.getChildren().add(spinner);
 		new Thread(() ->
 		{
 			try
 			{
 				boolean check = inputHandler.handleCheckSecret(secret);
+				inputHandler.handleRequestUpdate();
 
 				Platform.runLater(() ->
 				{
 					if (check)
 					{
 						loginLabelError.setVisible(false);
-						loginPane.setVisible(false);
 						loginPane.setDisable(true);
 						passwordsPane.setVisible(true);
+						loginPane.getChildren().remove(spinner);
+
+						playLoginAnimation();
 					} else
 					{
+						loginPane.setDisable(false);
+						loginPane.getChildren().remove(spinner);
 						loginLabelError.setText("Senha mestra incorreta.");
 						loginLabelError.setVisible(true);
 					}
@@ -165,14 +219,89 @@ public class CategoryViewGraphical implements IView
 			} catch (Exception e)
 			{
 				e.printStackTrace();
+			} finally
+			{
+				Arrays.fill(secret, (char) 0);
+				loginPasswordField.clear();
 			}
 		}).start();
+	}
+
+	private void playLoginAnimation()
+	{
+		FadeTransition fadeTransition = new FadeTransition();
+		fadeTransition.setNode(loginInnerPane);
+		fadeTransition.setDuration(Duration.seconds(0.17));
+		fadeTransition.setFromValue(1);
+		fadeTransition.setToValue(0);
+
+		PathTransition pathTransition = new PathTransition();
+		pathTransition.setNode(loginPane);
+		pathTransition.setDuration(Duration.seconds(0.4));
+
+		Line line = new Line();
+		Bounds paneBounds = loginPane.localToScene(loginPane.getBoundsInLocal());
+		line.setStartX(paneBounds.getMinX() + paneBounds.getWidth() / 2);
+		line.setStartY(paneBounds.getMinY() + paneBounds.getHeight() / 2);
+		line.setEndX(0 - paneBounds.getWidth() / 2);
+		line.setEndY(line.getStartY());
+
+		pathTransition.setPath(line);
+
+		FadeTransition fadeTransition2 = new FadeTransition();
+		fadeTransition2.setNode(leftPasswordsPane);
+		fadeTransition2.setDuration(Duration.seconds(0.10));
+		fadeTransition2.setFromValue(0);
+		fadeTransition2.setToValue(1);
+
+		SequentialTransition transition = new SequentialTransition(fadeTransition, pathTransition, fadeTransition2);
+		transition.setOnFinished(e ->
+		{
+			loginPane.setVisible(false);
+		});
+		transition.play();
 	}
 
 	@FXML
 	void logout(ActionEvent event)
 	{
-		
+		categoriesListView.getItems().clear();
+		categoriesListView.refresh();
+
+		loginPane.setDisable(false);
+		loginPane.setVisible(true);
+		playLogoutAnimation();
+	}
+
+	private void playLogoutAnimation()
+	{
+		FadeTransition fadeTransition = new FadeTransition();
+		fadeTransition.setNode(loginInnerPane);
+		fadeTransition.setDuration(Duration.seconds(0.17));
+		fadeTransition.setFromValue(0);
+		fadeTransition.setToValue(1);
+
+		PathTransition pathTransition = new PathTransition();
+		pathTransition.setNode(loginPane);
+		pathTransition.setDuration(Duration.seconds(0.4));
+
+		Line line = new Line();
+		Bounds paneBounds = loginPane.localToScene(loginPane.getBoundsInLocal());
+		line.setEndX(loginPane.getScene().getWidth() / 2);
+		line.setEndY(paneBounds.getMinY() + paneBounds.getHeight() / 2);
+		line.setStartX(0 - paneBounds.getWidth() / 2);
+		line.setStartY(line.getEndY());
+
+		pathTransition.setPath(line);
+
+		FadeTransition fadeTransition2 = new FadeTransition();
+		fadeTransition2.setNode(leftPasswordsPane);
+		fadeTransition2.setDuration(Duration.seconds(0.10));
+		fadeTransition2.setFromValue(1);
+		fadeTransition2.setToValue(0);
+
+		SequentialTransition transition = new SequentialTransition(fadeTransition2, pathTransition, fadeTransition);
+		transition.play();
 	}
 
 	@FXML
@@ -205,11 +334,40 @@ public class CategoryViewGraphical implements IView
 		nameLabel.setStyle("-fx-font-size: 12px;");
 		passLabel.setStyle(nameLabel.getStyle());
 
-		VBox vBox = new VBox(nameLabel, nameField, passLabel, passField);
+		Label errorLabel = new Label("Error");
+		errorLabel.setTextFill(Color.RED);
+		errorLabel.setVisible(false);
+		errorLabel.setStyle("-fx-font-size: 12px;");
+
+		VBox vBox = new VBox(nameLabel, nameField, passLabel, passField, errorLabel);
 		vBox.setSpacing(8);
 
 		buttonYes.setOnAction(e ->
 		{
+			if (nameField.getText().isEmpty())
+			{
+				errorLabel.setText("Name field is empty.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			char[] secret = passField.getText().toCharArray();
+			try
+			{
+				if (!inputHandler.handleCheckSecret(secret))
+				{
+					errorLabel.setText("Incorrect master password, try again.");
+					errorLabel.setVisible(true);
+					return;
+				}
+			} catch (Exception e2)
+			{
+				e2.printStackTrace();
+				errorLabel.setText("Error checking your master password, try again.");
+				errorLabel.setVisible(true);
+				return;
+			}
+			errorLabel.setVisible(false);
+
 			Platform.runLater(() ->
 			{
 				dialog.getLayout().getBody().clear();
@@ -221,22 +379,12 @@ public class CategoryViewGraphical implements IView
 			{
 				try
 				{
-					inputHandler.handleNewCategory(nameField.getText(), passField.getText().toCharArray());
+					inputHandler.handleNewCategory(nameField.getText(), secret);
 
 					Platform.runLater(() ->
 					{
 						dialog.setHeader("Success");
 						dialog.setBody("Category inserted successfully.");
-
-						buttonYes.setVisible(false);
-					});
-				} catch (IncorrectSecretException incorrectE)
-				{
-					incorrectE.printStackTrace();
-					Platform.runLater(() ->
-					{
-						dialog.setHeader("Errorr");
-						dialog.setBody("Incorrect master password, try again.");
 
 						buttonYes.setVisible(false);
 					});
@@ -247,6 +395,7 @@ public class CategoryViewGraphical implements IView
 				} finally
 				{
 					passField.clear();
+					Arrays.fill(secret, (char) 0);
 				}
 			}).start();
 		});
@@ -315,6 +464,21 @@ public class CategoryViewGraphical implements IView
 		catList.setMinHeight(120);
 		catList.getStyleClass().add("select-jfx-list");
 		catList.getItems().addAll(lastEntries);
+		catList.setCellFactory(lv -> new JFXListCell<CategoryHandlerResponse>()
+		{
+			@Override
+			protected void updateItem(CategoryHandlerResponse item, boolean empty)
+			{
+				super.updateItem(item, empty);
+				if (empty || item == null)
+				{
+					setText("");
+				} else
+				{
+					setText(item.getCategoryName());
+				}
+			}
+		});
 
 		buttonYes.setOnAction(e ->
 		{
@@ -346,7 +510,7 @@ public class CategoryViewGraphical implements IView
 				dialog.setHeader("Processing...");
 				dialog.getLayout().getBody().clear();
 				dialog.getLayout().setBody(new JFXSpinner());
-				
+
 				new Thread(() ->
 				{
 					errorLabel.setVisible(false);
@@ -428,6 +592,23 @@ public class CategoryViewGraphical implements IView
 	public void setInputHandler(CategoryInputHandler handler)
 	{
 		this.inputHandler = handler;
+
+		String rand = (Math.random() * 100000) + "";
+		try
+		{
+			if (!checkAccess && inputHandler != null && inputHandler.handleCheckSecret(rand.toCharArray()))
+			{
+				checkAccess = true;
+				Platform.runLater(() ->
+				{
+					firstAccessDialog();
+				});
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			Platform.exit();
+		}
 	}
 
 	@Override
@@ -435,4 +616,5 @@ public class CategoryViewGraphical implements IView
 	{
 		// TODO Auto-generated method stub
 	}
+
 }

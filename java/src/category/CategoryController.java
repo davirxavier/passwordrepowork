@@ -2,8 +2,6 @@ package category;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import database.IDAO;
@@ -360,7 +358,7 @@ public class CategoryController implements CategoryInputHandler
 	@Override
 	public boolean handleCheckSecret(char[] secret) throws Exception
 	{
-		if (secret == null || secret.length == 0)
+		if (secret == null)
 		{
 			return false;
 		}

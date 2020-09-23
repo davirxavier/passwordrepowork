@@ -1,6 +1,5 @@
 package category;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**

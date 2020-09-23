@@ -19,7 +19,7 @@
          <children>
             <SplitPane dividerPositions="0.28" prefHeight="160.0" prefWidth="200.0" style="-fx-background-color: -dcolor;">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="127.0" style="-fx-background-color: -dcolor;" SplitPane.resizableWithParent="false">
+                <AnchorPane fx:id="leftPasswordsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="127.0" style="-fx-background-color: -dcolor;" SplitPane.resizableWithParent="false">
                      <children>
                         <Label alignment="CENTER" layoutY="6.0" style="-fx-font: 14px &quot;Roboto Bold&quot;;" text="EPR" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0" />
                         <Line endX="112.29289245605469" layoutX="63.5" layoutY="30.0" startX="-65.0" style="-fx-stroke: white;" AnchorPane.leftAnchor="-2.0" AnchorPane.rightAnchor="1.7071075439453125" AnchorPane.topAnchor="29.5" />
