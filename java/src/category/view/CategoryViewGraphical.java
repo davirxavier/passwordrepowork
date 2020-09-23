@@ -149,6 +149,11 @@ public class CategoryViewGraphical implements IView
 		AnchorPane.setLeftAnchor(searchBar, 0.0);
 		AnchorPane.setRightAnchor(searchBar, 0.0);
 	}
+	
+	private void firstAccessDialog()
+	{
+		// TODO
+	}
 
 	@FXML
 	void login(ActionEvent event)
