@@ -381,18 +381,11 @@ public class CategoryDAO implements IDAO<Category>
 		String sqlRelation = "DELETE FROM " + DatabaseConstants.RelationConstants.relationTable + " " + "WHERE "
 				+ DatabaseConstants.RelationConstants.categoryColumn + " = ?;";
 		// Será completada mais na frente utilizando a resposta da "sqlQuery"
-		String sqlDeletePass = "DELETE FROM " + DatabaseConstants.PasswordConstants.passwordTable + " " + "WHERE "
-				+ DatabaseConstants.PasswordConstants.idColumn + " IN (";
-		String sqlQuery = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
-				+ "FROM " + CategoryConstants.categoryTable 
-					+ ", " + PasswordConstants.passwordTable 
-					+ ", " + RelationConstants.relationTable + " " 
-				+ "WHERE " + RelationConstants.relationTable + "." + RelationConstants.categoryColumn + " = ? "
-				+ "AND " + CategoryConstants.categoryTable + "." + CategoryConstants.idColumn + " = ? "
-				+ "AND " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
-						+ "= " + RelationConstants.relationTable + "." + RelationConstants.passwordColumn + ";";
+		String sqlDeletePass = "DELETE FROM " + PasswordConstants.passwordTable + " " + "WHERE "
+				+ PasswordConstants.idColumn + " IN (";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -405,28 +398,17 @@ public class CategoryDAO implements IDAO<Category>
 			}
 			statement.close();
 
-			statement = connection.prepareStatement(sqlQuery);
-			statement.setInt(1, t.getId());
-			statement.setInt(2, t.getId());
-
-			ResultSet resultSet = statement.executeQuery();
-			List<Integer> ids = new ArrayList<>();
-			while (resultSet.next())
-			{
-				ids.add(resultSet.getInt(DatabaseConstants.PasswordConstants.idColumn.toString()));
-			}
-
-			for (int id : ids)
+			for (Password p : t.getPasswords())
 			{
 				sqlDeletePass += "?,";
 			}
-			sqlDeletePass = sqlDeletePass.substring(0, sqlDeletePass.length()) + "-1);";
+			sqlDeletePass = sqlDeletePass + "-1);";
 
 			statement.close();
 			statement = connection.prepareStatement(sqlDeletePass);
-			for (int i = 0; i < ids.size(); i++)
+			for (int i = 0; i < t.getPasswords().size(); i++)
 			{
-				statement.setInt(i + 1, ids.get(i));
+				statement.setInt(i + 1, t.getPasswords().get(i).getId());
 			}
 			statement.execute();
 			statement.close();
@@ -434,8 +416,11 @@ public class CategoryDAO implements IDAO<Category>
 			statement = connection.prepareStatement(sqlRelation);
 			statement.setInt(1, t.getId());
 			statement.execute();
+			
+			connection.commit();
 		} catch (Exception e)
 		{
+			connection.rollback();
 			throw e;
 		} finally
 		{
