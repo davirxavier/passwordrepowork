@@ -155,6 +155,7 @@ public class CategoryDAO implements IDAO<Category>
 				+ CategoryConstants.categoryTable + ";";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		PreparedStatement statementRelation = null;
 		try
@@ -213,9 +214,15 @@ public class CategoryDAO implements IDAO<Category>
 			{
 				passwords.put(category.getId() + "", category.getPasswords());
 			}
+			
 			PASSWORD_DAO.insertAll(passwords);
+			connection.commit();
 		} catch (Exception e)
 		{
+			if (!connection.getAutoCommit())
+			{
+				connection.rollback();
+			}
 			throw e;
 		} finally
 		{
@@ -318,6 +325,7 @@ public class CategoryDAO implements IDAO<Category>
 				+ CategoryConstants.categoryTable + ";";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -360,8 +368,13 @@ public class CategoryDAO implements IDAO<Category>
 			HashMap<String, List<Password>> passwords = new HashMap<>();
 			passwords.put(category.getId() + "", category.getPasswords());
 			PASSWORD_DAO.insertAll(passwords);
+			connection.commit();
 		} catch (Exception e)
 		{
+			if (!connection.getAutoCommit())
+			{
+				connection.rollback();
+			}
 			throw e;
 		} finally
 		{

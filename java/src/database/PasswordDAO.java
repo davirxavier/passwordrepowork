@@ -320,6 +320,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				+ DatabaseConstants.RelationConstants.passwordColumn + " = ?;";
 
 		Connection connection = manager.getConnection();
+		connection.setAutoCommit(false);
 		PreparedStatement statement = null;
 		try
 		{
@@ -331,6 +332,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			statement = connection.prepareStatement(sqlRelation);
 			statement.setInt(1, t.getId());
 			statement.execute();
+			connection.commit();
 
 			if (statement.getUpdateCount() == 0)
 			{
@@ -338,6 +340,7 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 			}
 		} catch (Exception e)
 		{
+			connection.rollback();
 			throw e;
 		} finally
 		{
