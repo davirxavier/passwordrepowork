@@ -48,6 +48,7 @@ public class CategoryViewGraphical implements IView
 {
 	private CategoryInputHandler inputHandler;
 	private List<CategoryHandlerResponse> lastEntries;
+	private boolean checkAccess;
 
 	@FXML
 	public AnchorPane primaryPane;
@@ -85,6 +86,7 @@ public class CategoryViewGraphical implements IView
 	public CategoryViewGraphical()
 	{
 		lastEntries = new ArrayList<CategoryHandlerResponse>();
+		checkAccess = false;
 	}
 
 	@FXML
@@ -149,10 +151,27 @@ public class CategoryViewGraphical implements IView
 		AnchorPane.setLeftAnchor(searchBar, 0.0);
 		AnchorPane.setRightAnchor(searchBar, 0.0);
 	}
-	
+
 	private void firstAccessDialog()
 	{
-		// TODO
+		String header = "Important Information";
+		String body = "As this is your first time accessing the app, the Master\n"
+				+ "Password asked won't be checked until you create your first Password.\n\n"
+				+ "Be sure to pay attention when creating your first password,\n"
+				+ "as the Master Password you use when creating it will be used\n"
+				+ "globally and permanently.";
+
+		JFXButton button = new JFXButton("I understand");
+		button.getStyleClass().add("button-dark");
+		
+		FlatJFXDialog dialog = new FlatJFXDialog(loginPane, header, body, button);
+		
+		button.setOnAction(e ->
+		{
+			dialog.getDialog().close();
+		});
+		
+		dialog.getDialog().show();
 	}
 
 	@FXML
@@ -200,10 +219,9 @@ public class CategoryViewGraphical implements IView
 			} catch (Exception e)
 			{
 				e.printStackTrace();
-			}
-			finally
+			} finally
 			{
-				Arrays.fill(secret, (char)0);
+				Arrays.fill(secret, (char) 0);
 				loginPasswordField.clear();
 			}
 		}).start();
@@ -269,7 +287,7 @@ public class CategoryViewGraphical implements IView
 
 		Line line = new Line();
 		Bounds paneBounds = loginPane.localToScene(loginPane.getBoundsInLocal());
-		line.setEndX(loginPane.getScene().getWidth()/2);
+		line.setEndX(loginPane.getScene().getWidth() / 2);
 		line.setEndY(paneBounds.getMinY() + paneBounds.getHeight() / 2);
 		line.setStartX(0 - paneBounds.getWidth() / 2);
 		line.setStartY(line.getEndY());
@@ -315,7 +333,7 @@ public class CategoryViewGraphical implements IView
 
 		nameLabel.setStyle("-fx-font-size: 12px;");
 		passLabel.setStyle(nameLabel.getStyle());
-		
+
 		Label errorLabel = new Label("Error");
 		errorLabel.setTextFill(Color.RED);
 		errorLabel.setVisible(false);
@@ -341,8 +359,7 @@ public class CategoryViewGraphical implements IView
 					errorLabel.setVisible(true);
 					return;
 				}
-			} 
-			catch (Exception e2)
+			} catch (Exception e2)
 			{
 				e2.printStackTrace();
 				errorLabel.setText("Error checking your master password, try again.");
@@ -350,7 +367,7 @@ public class CategoryViewGraphical implements IView
 				return;
 			}
 			errorLabel.setVisible(false);
-			
+
 			Platform.runLater(() ->
 			{
 				dialog.getLayout().getBody().clear();
@@ -378,7 +395,7 @@ public class CategoryViewGraphical implements IView
 				} finally
 				{
 					passField.clear();
-					Arrays.fill(secret, (char)0);
+					Arrays.fill(secret, (char) 0);
 				}
 			}).start();
 		});
@@ -575,6 +592,23 @@ public class CategoryViewGraphical implements IView
 	public void setInputHandler(CategoryInputHandler handler)
 	{
 		this.inputHandler = handler;
+
+		String rand = (Math.random() * 100000) + "";
+		try
+		{
+			if (!checkAccess && inputHandler != null && inputHandler.handleCheckSecret(rand.toCharArray()))
+			{
+				checkAccess = true;
+				Platform.runLater(() ->
+				{
+					firstAccessDialog();
+				});
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			Platform.exit();
+		}
 	}
 
 	@Override

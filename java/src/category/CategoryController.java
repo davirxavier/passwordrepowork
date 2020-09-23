@@ -358,7 +358,7 @@ public class CategoryController implements CategoryInputHandler
 	@Override
 	public boolean handleCheckSecret(char[] secret) throws Exception
 	{
-		if (secret == null || secret.length == 0)
+		if (secret == null)
 		{
 			return false;
 		}
