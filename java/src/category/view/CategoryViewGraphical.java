@@ -2,7 +2,6 @@ package category.view;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import com.jfoenix.controls.JFXButton;
@@ -20,7 +19,6 @@ import category.view.nodes.FlatJFXDialog;
 import category.view.nodes.SearchBar;
 import exceptions.database.IncorrectSecretException;
 import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
 import javafx.animation.PathTransition;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;

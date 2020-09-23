@@ -383,9 +383,14 @@ public class CategoryDAO implements IDAO<Category>
 		// Será completada mais na frente utilizando a resposta da "sqlQuery"
 		String sqlDeletePass = "DELETE FROM " + DatabaseConstants.PasswordConstants.passwordTable + " " + "WHERE "
 				+ DatabaseConstants.PasswordConstants.idColumn + " IN (";
-		String sqlQuery = "SELECT passwords.id " + "FROM categories, passwords, category_password "
-				+ "WHERE category_password.category_id = ? " + "AND categories.id = ? "
-				+ "AND passwords.id = category_password.password_id;";
+		String sqlQuery = "SELECT " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
+				+ "FROM " + CategoryConstants.categoryTable 
+					+ ", " + PasswordConstants.passwordTable 
+					+ ", " + RelationConstants.relationTable + " " 
+				+ "WHERE " + RelationConstants.relationTable + "." + RelationConstants.categoryColumn + " = ? "
+				+ "AND " + CategoryConstants.categoryTable + "." + CategoryConstants.idColumn + " = ? "
+				+ "AND " + PasswordConstants.passwordTable + "." + PasswordConstants.idColumn + " "
+						+ "= " + RelationConstants.relationTable + "." + RelationConstants.passwordColumn + ";";
 
 		Connection connection = manager.getConnection();
 		PreparedStatement statement = null;

@@ -4,10 +4,8 @@ import com.jfoenix.controls.JFXButton;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Paint;
 
 public class ToolbarButton extends JFXButton
 {

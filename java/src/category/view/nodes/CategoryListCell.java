@@ -35,9 +35,9 @@ import res.img.ImagePath;
 
 public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 {
-	//Tracks which cell is expanded by its category's id
+	// Tracks which cell is expanded by its category's id
 	private static HashMap<Integer, Boolean> expanded_list = new HashMap<>();
-	
+
 	// nodes
 	private ToolbarButton deleteButton;
 	private ToolbarButton editButton;
@@ -73,7 +73,7 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 		mainVBox.setFillWidth(true);
 		mainVBox.setSpacing(8);
 		mainVBox.setStyle("-fx-padding: 0 0 6px 2px;");
-		
+
 		passwordNodes = new ArrayList<>();
 		setOnMouseClicked((e) ->
 		{
@@ -89,14 +89,14 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 
 			setExpanded(!isExpanded());
 		});
-		
+
 		expanded.addListener(c ->
 		{
 			if (currentNode != null)
 			{
 				expanded_list.put(currentNode.getCatId(), isExpanded());
 			}
-			
+
 			if (isExpanded())
 			{
 				arrow.setImage(arrowLess);
@@ -105,6 +105,14 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 				arrow.setImage(arrowMore);
 			}
 			updateItem(currentNode, isEmpty());
+		});
+		
+		deleteButton.setOnAction(e ->
+		{
+			if (currentNode != null)
+			{
+				deleteCategoryDialog(currentNode.getCatId());
+			}
 		});
 	}
 
@@ -122,7 +130,7 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 			return;
 		}
 		this.currentNode = node;
-		
+
 		if (expanded_list.containsKey(currentNode.getCatId()))
 		{
 			boolean expanded = expanded_list.get(currentNode.getCatId());
@@ -218,6 +226,105 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 		this.inputHandler = inputHandler;
 	}
 
+	private void deleteCategoryDialog(int catid)
+	{
+		StackPane mainPane = (StackPane) getScene().lookup("#passwordsPane");
+		String body = "Do you really want to delete this category? All passwords related will be removed as well.";
+		
+		JFXButton buttonNo = new JFXButton("No");
+		JFXButton buttonYes = new JFXButton("Yes");
+		buttonNo.getStyleClass().add("button-dark");
+		buttonYes.getStyleClass().addAll(buttonNo.getStyleClass());
+		
+		FlatJFXDialog dialog = new FlatJFXDialog(mainPane, "Confirm your choice", body, buttonNo, buttonYes);
+		
+		buttonYes.setOnAction(e ->
+		{
+			dialog.setHeader("Insert your master password: ");
+			
+			JFXPasswordField passwordField = new JFXPasswordField();
+			passwordField.setPromptText("Master password");
+			
+			Label errorLabel = new Label("Error");
+			errorLabel.setVisible(false);
+			errorLabel.setTextFill(Color.RED);
+			errorLabel.setStyle("-fx-font-size: 12px;");
+			
+			VBox vBox = new VBox(passwordField, errorLabel);
+			vBox.setSpacing(8);
+			dialog.getLayout().setBody(vBox);
+			
+			buttonYes.setText("Confirm");
+			buttonYes.setOnAction(eventDelete ->
+			{
+				char[] secret = passwordField.getText().toCharArray();
+				
+				try
+				{
+					if (!inputHandler.handleCheckSecret(secret))
+					{
+						Arrays.fill(secret, (char)0);
+						errorLabel.setText("Incorrect master password, try again.");
+						errorLabel.setVisible(true);
+						return;
+					}
+				} 
+				catch (Exception e2)
+				{
+					e2.printStackTrace();
+					return;
+				}
+				
+				dialog.setHeader("Processing...");
+				dialog.getLayout().setBody(new JFXSpinner());
+				buttonYes.setVisible(false);
+				buttonNo.setVisible(false);
+				
+				new Thread(() ->
+				{
+					try
+					{
+						inputHandler.handleDeleteCategory(catid, secret);
+						
+						Platform.runLater(() ->
+						{
+							dialog.setHeader("Success");
+							dialog.setBody("Category deleted successfully.");
+							
+							buttonNo.setText("Close");
+							buttonNo.setVisible(true);
+						});
+					} 
+					catch (Exception e1)
+					{
+						e1.printStackTrace();
+						
+						Platform.runLater(() ->
+						{
+							dialog.setHeader("Error");
+							dialog.setBody("Error deleting category, try again.");
+							
+							buttonNo.setText("Close");
+							buttonNo.setVisible(true);
+						});
+					}
+					finally 
+					{
+						Arrays.fill(secret, (char)0);
+						passwordField.clear();
+					}
+					
+				}).start();
+			});
+			buttonNo.setText("Cancel delete");
+		});
+		buttonNo.setOnAction(e ->
+		{
+			dialog.getDialog().close();
+		});
+		dialog.getDialog().show();
+	}
+
 	private void viewPasswordDialog(String[] split, int catid, int passid)
 	{
 		StackPane mainPane = (StackPane) getScene().lookup("#passwordsPane");
@@ -291,15 +398,15 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 						JFXButton buttonDelete = new JFXButton("Delete Password");
 						buttonDelete.getStyleClass().addAll(buttonYes.getStyleClass());
 						dialog.getLayout().getActions().add(0, buttonDelete);
-						
+
 						dialog.getDialog().setOnDialogClosed(closed ->
 						{
 							passField.clear();
-							Arrays.fill(secret, (char)0);
-							Arrays.fill(secretc, (char)0);
-							Arrays.fill(decryptedPassword, (char)0);
+							Arrays.fill(secret, (char) 0);
+							Arrays.fill(secretc, (char) 0);
+							Arrays.fill(decryptedPassword, (char) 0);
 						});
-						
+
 						buttonDelete.setOnAction(eventDelete ->
 						{
 							dialog.setHeader("Confirm your choice");
@@ -307,12 +414,12 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 							buttonNo.setText("No");
 							buttonYes.setText("Yes");
 							buttonDelete.setVisible(false);
-							
+
 							buttonYes.setOnAction(eventYesDelete ->
 							{
 								dialog.setHeader("Processing...");
 								dialog.getLayout().setBody(new JFXSpinner());
-								
+
 								new Thread(() ->
 								{
 									try
@@ -322,26 +429,24 @@ public class CategoryListCell extends JFXListCell<CategoryHandlerResponse>
 										{
 											dialog.setHeader("Success");
 											dialog.setBody("Password deleted successfully.");
-											
+
 											buttonYes.setVisible(false);
 											buttonDelete.setVisible(false);
 											buttonNo.setText("Close");
 										});
-									} 
-									catch (Exception e1)
+									} catch (Exception e1)
 									{
 										e1.printStackTrace();
 										Platform.runLater(() ->
 										{
 											dialog.setHeader("Error");
 											dialog.setBody("There was an error deleting the password, try again.");
-											
+
 											buttonYes.setVisible(false);
 											buttonDelete.setVisible(false);
 											buttonNo.setText("Close");
 										});
-									}
-									finally 
+									} finally
 									{
 										Arrays.fill(secret, (char) 0);
 										Arrays.fill(secretc, (char) 0);
