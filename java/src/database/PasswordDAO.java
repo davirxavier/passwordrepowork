@@ -183,7 +183,6 @@ public class PasswordDAO implements IDAOInner<Password, char[]>
 				{
 					newId = resultSet.getInt("maxid") + 1;
 				}
-				System.out.println(newId);
 				resultSet.close();
 				statement.close();
 
